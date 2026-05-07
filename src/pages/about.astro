@@ -1,0 +1,32 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import PageHero from "@/components/PageHero.astro";
+import Strategy from "@/components/sections/Strategy.astro";
+import Stats from "@/components/sections/Stats.astro";
+import Accounts from "@/components/sections/Accounts.astro";
+import Founders from "@/components/sections/Founders.astro";
+import Partnership from "@/components/sections/Partnership.astro";
+---
+
+<Layout
+  title="ABOUT — YAJA Inc."
+  description="대한민국 No.1 숏폼 드라마 스튜디오 YAJA Inc.의 회사 소개, 전략, 창업 멤버."
+>
+  <Header />
+  <main>
+    <PageHero
+      eyebrow="About"
+      title="우리는 다음 세대의"
+      accent="이야기를 만든다"
+      subtitle="YAJA Inc.는 한국 최고의 크리에이터와 프로듀서가 모여 2024년 설립된 K-Short Drama Studio입니다."
+    />
+    <Strategy />
+    <Stats />
+    <Accounts />
+    <Founders />
+    <Partnership />
+  </main>
+  <Footer />
+</Layout>

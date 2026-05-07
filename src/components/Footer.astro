@@ -1,93 +1,105 @@
 ---
 import { site } from "@/lib/site";
 const year = new Date().getFullYear();
+
+/**
+ * Footer — full sitemap matching OASIZ's bottom-of-page pattern.
+ */
+const sitemap = [
+  {
+    title: "Sitemap",
+    items: [
+      { label: "Home", href: "/" },
+      { label: "About", href: "/about" },
+      { label: "Projects", href: "/projects" },
+      { label: "Column", href: "/column" },
+      { label: "News", href: "/news" },
+      { label: "Contact", href: "/contact" },
+    ],
+  },
+  {
+    title: "Channels",
+    items: [
+      { label: "@yajacamp", href: "https://www.tiktok.com/@yajacamp", external: true },
+      { label: "@ycn_videographer", href: "https://www.tiktok.com/@ycn_videographer", external: true },
+    ],
+  },
+  {
+    title: "Contact",
+    items: [
+      { label: site.email, href: `mailto:${site.email}` },
+      { label: site.address, href: null },
+    ],
+  },
+];
 ---
 
-<footer class="border-t border-white/5 bg-yaja-dark py-14">
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div class="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
-      <div class="flex items-center gap-3">
-        <img
-          src="/logos/fire-symbol/red-symbol.png"
-          alt="YAJA"
-          width="40"
-          height="40"
-          class="h-9 w-auto"
-        />
-        <div>
+<footer class="border-t border-white/8 bg-yaja-dark py-16 md:py-20">
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <div class="grid gap-12 md:grid-cols-[1fr_auto] md:items-start md:gap-20">
+      <!-- Brand column -->
+      <div>
+        <a href="/" class="inline-flex items-center gap-3">
+          <img
+            src="/logos/fire-symbol/red-symbol.png"
+            alt="YAJA"
+            width="48"
+            height="48"
+            class="h-10 w-auto"
+          />
           <p class="font-num text-base font-extrabold tracking-tight">
             YAJA Inc.
           </p>
-          <p class="text-sm text-yaja-gray-mid">{site.description}</p>
-        </div>
+        </a>
+        <p class="mt-5 max-w-[40ch] text-sm text-yaja-gray-mid md:text-base">
+          {site.description}
+        </p>
+        <p class="font-num mt-2 text-[11px] uppercase tracking-[0.18em] text-yaja-gray">
+          {site.tagline}
+        </p>
       </div>
 
-      <div class="grid gap-8 sm:grid-cols-3">
-        <div>
-          <p
-            class="font-num text-[11px] font-semibold uppercase tracking-[0.12em] text-yaja-gray"
-          >
-            Studio
-          </p>
-          <ul class="mt-3 space-y-2 text-sm">
-            <li><a class="hover:text-yaja-red" href="#about">About</a></li>
-            <li><a class="hover:text-yaja-red" href="#works">Works</a></li>
-            <li><a class="hover:text-yaja-red" href="#services">Services</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <p
-            class="font-num text-[11px] font-semibold uppercase tracking-[0.12em] text-yaja-gray"
-          >
-            Channels
-          </p>
-          <ul class="mt-3 space-y-2 text-sm">
-            <li>
-              <a
-                class="hover:text-yaja-red"
-                href="https://www.tiktok.com/@yajacamp"
-                target="_blank"
-                rel="noopener"
-              >
-                @yajacamp
-              </a>
-            </li>
-            <li>
-              <a
-                class="hover:text-yaja-red"
-                href="https://www.tiktok.com/@ycn_videographer"
-                target="_blank"
-                rel="noopener"
-              >
-                @ycn_videographer
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <p
-            class="font-num text-[11px] font-semibold uppercase tracking-[0.12em] text-yaja-gray"
-          >
-            Contact
-          </p>
-          <ul class="mt-3 space-y-2 text-sm">
-            <li>
-              <a class="hover:text-yaja-red" href={`mailto:${site.email}`}>
-                {site.email}
-              </a>
-            </li>
-          </ul>
-        </div>
+      <!-- Sitemap columns -->
+      <div class="grid gap-10 sm:grid-cols-3 md:gap-16">
+        {
+          sitemap.map((col) => (
+            <div>
+              <p class="font-num text-[10px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+                {col.title}
+              </p>
+              <ul class="mt-4 space-y-2.5 text-sm">
+                {col.items.map((item) =>
+                  item.href ? (
+                    <li>
+                      <a
+                        href={item.href}
+                        target={item.external ? "_blank" : undefined}
+                        rel={item.external ? "noopener" : undefined}
+                        class="font-num text-yaja-white/80 transition-colors hover:text-yaja-red"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  ) : (
+                    <li class="font-num text-yaja-gray">{item.label}</li>
+                  ),
+                )}
+              </ul>
+            </div>
+          ))
+        }
       </div>
     </div>
 
     <div
-      class="mt-12 flex flex-col gap-2 border-t border-white/5 pt-6 text-xs text-yaja-gray-mid sm:flex-row sm:items-center sm:justify-between"
+      class="mt-16 flex flex-col gap-3 border-t border-white/8 pt-6 text-xs text-yaja-gray-mid sm:flex-row sm:items-center sm:justify-between"
     >
-      <p>© {year} YAJA Inc. All rights reserved.</p>
-      <p class="font-num tracking-[0.08em]">대한민국 No.1 숏폼 드라마 스튜디오</p>
+      <p class="font-num tracking-[0.06em]">
+        © {year} YAJA Inc. All rights reserved.
+      </p>
+      <p class="font-num tracking-[0.18em] uppercase">
+        K-Short Drama Studio · Est. 2024
+      </p>
     </div>
   </div>
 </footer>

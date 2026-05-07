@@ -1,0 +1,28 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import PageHero from "@/components/PageHero.astro";
+import Projects from "@/components/sections/Projects.astro";
+import Clients from "@/components/sections/Clients.astro";
+import Categories from "@/components/sections/Categories.astro";
+---
+
+<Layout
+  title="PROJECTS — YAJA Inc."
+  description="Vaseline · Samsung · Adobe · PERSOL APAC 등 글로벌 브랜드와 함께한 YAJA의 캠페인 사례."
+>
+  <Header />
+  <main>
+    <PageHero
+      eyebrow="Projects"
+      title="검증된"
+      accent="성과"
+      subtitle="YAJA가 운영한 모든 캠페인은 기획부터 운영까지 풀-스택으로 진행됩니다. 일부 사례를 소개합니다."
+    />
+    <Projects />
+    <Categories />
+    <Clients />
+  </main>
+  <Footer />
+</Layout>

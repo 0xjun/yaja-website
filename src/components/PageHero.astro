@@ -1,0 +1,60 @@
+---
+/**
+ * Compact hero for sub-pages (about / projects / column / news / contact).
+ * Mirrors OASIZ's sub-page header pattern — eyebrow + giant title + sub.
+ */
+interface Props {
+  eyebrow: string;
+  title: string;
+  accent?: string;
+  subtitle?: string;
+}
+const { eyebrow, title, accent, subtitle } = Astro.props;
+---
+
+<section
+  class="relative isolate overflow-hidden bg-yaja-dark pb-16 pt-40 md:pb-24 md:pt-56"
+  aria-labelledby="page-title"
+>
+  <!-- Soft red orb backdrop -->
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <div
+      class="absolute -left-[10%] top-[20%] h-[40vmin] w-[40vmin] rounded-full bg-yaja-red/12 blur-[120px] anim-orb-drift"
+    >
+    </div>
+    <div
+      class="absolute inset-0 opacity-[0.04]"
+      style="background-image: linear-gradient(135deg, transparent 49.5%, white 49.5% 50.5%, transparent 50.5%); background-size: 32px 32px;"
+    >
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <p
+      class="font-num inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red anim-fade-in"
+    >
+      <span class="block h-px w-8 bg-yaja-red"></span>
+      {eyebrow}
+    </p>
+
+    <h1
+      id="page-title"
+      class="anim-fade-in mt-8 max-w-[20ch] font-black leading-[0.95] tracking-[-0.025em] md:mt-12"
+      style="font-size: clamp(48px, 9vw, 144px); animation-delay: 0.1s;"
+    >
+      {title}
+      {accent && <span class="text-yaja-red">{accent}</span>}
+    </h1>
+
+    {
+      subtitle && (
+        <p
+          class="anim-fade-in mt-8 max-w-[52ch] text-yaja-gray md:text-xl"
+          style="animation-delay: 0.2s;"
+        >
+          {subtitle}
+        </p>
+      )
+    }
+  </div>
+</section>

@@ -1,9 +1,11 @@
 ---
+import VerticalVideo from "@/components/VerticalVideo.astro";
 import { projects } from "@/lib/site";
 
 /**
- * OASIZ §5 mirror — rich case-study cards (1 column wide,
- * each row: brand + title + tags + description + metric).
+ * OASIZ §5 mirror — rich case-study cards with vertical (9:16) video
+ * slot on the left, content on the right. Until a real MP4 is provided,
+ * the slot renders a moody placeholder.
  */
 ---
 
@@ -25,54 +27,64 @@ import { projects } from "@/lib/site";
       검증된 <span class="text-yaja-red">성과</span>
     </h2>
 
-    <div class="reveal reveal-stagger mt-16 grid gap-6 md:mt-20 md:grid-cols-2 md:gap-8">
+    <div class="reveal reveal-stagger mt-16 space-y-16 md:mt-24 md:space-y-24">
       {
-        projects.map((p) => (
-          <article class="group relative flex flex-col overflow-hidden rounded-lg border border-white/10 bg-gradient-to-b from-white/[0.03] to-transparent p-8 transition-colors hover:border-yaja-red/40 md:p-10">
-            {/* Top: brand + handle */}
-            <div class="flex items-center justify-between">
-              <p class="font-num text-2xl font-black tracking-tight md:text-3xl">
+        projects.map((p, i) => (
+          <article
+            class:list={[
+              "group grid items-center gap-8 md:gap-14",
+              "md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr]",
+              i % 2 === 1 ? "md:[&>*:first-child]:order-2" : "",
+            ]}
+          >
+            {/* Vertical video slot (9:16) */}
+            <VerticalVideo
+              src={p.video || undefined}
+              brand={p.brand}
+              className="mx-auto w-full max-w-[260px] md:max-w-none"
+            />
+
+            {/* Content */}
+            <div>
+              <p class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+                {p.type}
+              </p>
+              <p
+                class="font-num mt-3 font-black tracking-[-0.025em]"
+                style="font-size: clamp(28px, 3.6vw, 56px);"
+              >
                 {p.brand}
               </p>
-              <span class="font-num text-xs text-yaja-gray-mid md:text-sm">
+              <p class="font-num mt-1 text-sm text-yaja-gray-mid md:text-base">
                 {p.handle}
-              </span>
-            </div>
-
-            <p class="font-num mt-2 text-[11px] uppercase tracking-[0.18em] text-yaja-red">
-              {p.type}
-            </p>
-
-            {/* Title */}
-            <h3 class="mt-6 text-lg font-bold leading-snug md:text-xl">
-              {p.title}
-            </h3>
-
-            {/* Description */}
-            <p class="mt-4 flex-1 text-sm leading-relaxed text-yaja-gray-mid md:text-base">
-              {p.description}
-            </p>
-
-            {/* Tags */}
-            <ul class="mt-6 flex flex-wrap gap-2">
-              {p.tags.map((tag) => (
-                <li class="font-num rounded-full border border-white/15 px-3 py-1 text-[10px] uppercase tracking-[0.12em] text-yaja-gray">
-                  {tag}
-                </li>
-              ))}
-            </ul>
-
-            {/* Metric */}
-            <div class="mt-8 border-t border-white/10 pt-6">
-              <p class="font-num text-[10px] uppercase tracking-[0.18em] text-yaja-gray">
-                {p.metric.label}
               </p>
-              <p class="font-num mt-2 text-3xl font-black tracking-tight md:text-4xl">
-                {p.metric.value}
-                <span class="ml-1 text-base font-bold text-yaja-gray-mid">
-                  {p.metric.unit}
+
+              <h3 class="mt-6 max-w-[44ch] text-lg font-bold leading-snug md:text-2xl">
+                {p.title}
+              </h3>
+              <p class="mt-4 max-w-[60ch] text-sm leading-relaxed text-yaja-gray-mid md:text-base">
+                {p.description}
+              </p>
+
+              <ul class="mt-6 flex flex-wrap gap-2">
+                {p.tags.map((tag) => (
+                  <li class="font-num rounded-full border border-white/15 px-3 py-1 text-[10px] uppercase tracking-[0.12em] text-yaja-gray">
+                    {tag}
+                  </li>
+                ))}
+              </ul>
+
+              <div class="mt-8 flex items-baseline gap-3 border-t border-white/10 pt-6">
+                <span class="font-num text-[10px] uppercase tracking-[0.18em] text-yaja-gray">
+                  {p.metric.label}
                 </span>
-              </p>
+                <span class="font-num text-3xl font-black tracking-tight md:text-5xl">
+                  {p.metric.value}
+                  <span class="ml-1 text-base font-bold text-yaja-gray-mid">
+                    {p.metric.unit}
+                  </span>
+                </span>
+              </div>
             </div>
           </article>
         ))

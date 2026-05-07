@@ -77,6 +77,10 @@
 
 <script>
   import Lenis from "lenis";
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
 
   // ===== Smooth scroll =====
   const lenis = new Lenis({
@@ -86,11 +90,10 @@
     touchMultiplier: 1.4,
   });
 
-  function raf(time: number) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
-  requestAnimationFrame(raf);
+  // Sync Lenis with GSAP ticker so ScrollTrigger stays in lockstep
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add((time) => lenis.raf(time * 1000));
+  gsap.ticker.lagSmoothing(0);
 
   // Smooth-scroll for anchor links
   document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
@@ -104,6 +107,94 @@
       }
     });
   });
+
+  // ===== Cinematic scroll storytelling =====
+  // 1. Hero parallax: background drifts up, content fades + scales
+  const heroBg = document.querySelector(".hero-bg");
+  const heroStage = document.querySelector(".hero-stage");
+  const hero = document.querySelector(".hero");
+
+  if (hero && heroBg && heroStage) {
+    gsap.to(heroBg, {
+      yPercent: -25,
+      ease: "none",
+      scrollTrigger: {
+        trigger: hero,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.8,
+      },
+    });
+
+    gsap.to(heroStage, {
+      opacity: 0,
+      yPercent: -15,
+      filter: "blur(8px)",
+      ease: "power1.in",
+      scrollTrigger: {
+        trigger: hero,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.8,
+      },
+    });
+  }
+
+  // 2. Per-section progressive reveal — GSAP drives explicit
+  //    fromTo so initial CSS opacity:0 is honoured during SSR.
+  document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
+    gsap.fromTo(
+      el,
+      { opacity: 0, y: 60, filter: "blur(8px)" },
+      {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+        duration: 1.2,
+        ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 85%" },
+        onStart: () => el.classList.add("is-visible"),
+      },
+    );
+  });
+
+  // 3. Stagger children inside .reveal-stagger
+  document.querySelectorAll<HTMLElement>(".reveal-stagger").forEach((parent) => {
+    const children = parent.children;
+    gsap.fromTo(
+      children,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.9,
+        stagger: 0.08,
+        ease: "power3.out",
+        scrollTrigger: { trigger: parent, start: "top 85%" },
+      },
+    );
+  });
+
+  // 4. Number scrub: any element with [data-scrub-num] tweens its
+  //    text content from 0 to data-target as it enters viewport
+  document
+    .querySelectorAll<HTMLElement>("[data-scrub-num]")
+    .forEach((el) => {
+      const target = parseFloat(el.getAttribute("data-scrub-num") || "0");
+      const obj = { val: 0 };
+      gsap.to(obj, {
+        val: target,
+        duration: 1.6,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: el,
+          start: "top 80%",
+        },
+        onUpdate: () => {
+          el.textContent = Math.round(obj.val).toLocaleString();
+        },
+      });
+    });
 
   // ===== Custom cursor =====
   const cursor = document.getElementById("yaja-cursor");

@@ -1,0 +1,56 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import PageHero from "@/components/PageHero.astro";
+import { news } from "@/lib/site";
+---
+
+<Layout
+  title="NEWS — YAJA Inc."
+  description="YAJA Inc.의 최신 소식, 수상, 신작 발표."
+>
+  <Header />
+  <main>
+    <PageHero
+      eyebrow="News"
+      title="최신"
+      accent="소식"
+      subtitle="YAJA Inc.의 회사 발표, 수상 이력, 협업 소식을 모아둡니다."
+    />
+
+    <section class="bg-yaja-dark py-16 md:py-24">
+      <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+        <ul class="reveal reveal-stagger divide-y divide-white/10 border-y border-white/10">
+          {
+            news.map((n) => (
+              <li>
+                <a
+                  href="#"
+                  class="group grid grid-cols-[120px_1fr_auto] items-center gap-6 py-8 transition-colors hover:bg-white/[0.02] md:grid-cols-[160px_140px_1fr_auto] md:gap-10 md:py-10"
+                >
+                  <span class="font-num text-sm text-yaja-gray-mid md:text-base">
+                    {n.date}
+                  </span>
+                  <span class="font-num hidden w-fit rounded-full border border-yaja-red/40 px-3 py-1 text-center text-[10px] font-semibold uppercase tracking-[0.12em] text-yaja-red md:inline-block">
+                    {n.category}
+                  </span>
+                  <span class="font-num text-base font-medium leading-snug transition-colors group-hover:text-yaja-red md:text-xl">
+                    {n.title}
+                  </span>
+                  <span
+                    class="font-num text-yaja-gray-mid transition-colors group-hover:text-yaja-red"
+                    aria-hidden="true"
+                  >
+                    →
+                  </span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>
