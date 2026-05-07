@@ -57,11 +57,16 @@ const {
   </head>
 
   <body class="bg-yaja-dark text-yaja-white antialiased">
+    <!-- Subtle film-grain overlay (DESIGN.md cinematic) -->
+    <div class="film-grain" aria-hidden="true"></div>
+
     <SmoothScroll />
 
     <slot />
 
-    <!-- Reveal-on-scroll observer (works for any element with .reveal) -->
+    <!-- Reveal-on-scroll observer.
+         Threshold 0 + small bottom margin = triggers as soon as the
+         element peeks above the bottom 8% of the viewport. -->
     <script>
       const observer = new IntersectionObserver(
         (entries) => {
@@ -72,7 +77,7 @@ const {
             }
           });
         },
-        { threshold: 0.15, rootMargin: "0px 0px -10% 0px" }
+        { threshold: 0, rootMargin: "0px 0px -8% 0px" }
       );
 
       document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));

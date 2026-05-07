@@ -15,26 +15,33 @@ const letters = ["Y", "A", "J", "A"];
   class="hero relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-yaja-dark"
   aria-label="Hero"
 >
-  <!-- Background — soft graduated wash, no decoration. OASIZ-clean. -->
-  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
-    <!-- Top vignette -->
+  <!-- Background — parallax-enabled, scroll-timeline drives upward
+       drift. Decorations: red orb that breathes + diagonal grain. -->
+  <div class="hero-bg pointer-events-none absolute inset-0 -z-10 scroll-parallax" aria-hidden="true">
+    <!-- Top wash -->
     <div
-      class="absolute inset-x-0 top-0 h-[40vh]"
-      style="background: linear-gradient(to bottom, rgba(255,72,72,0.06), transparent);"
+      class="absolute inset-x-0 top-0 h-[50vh]"
+      style="background: linear-gradient(to bottom, rgba(255,72,72,0.07), transparent);"
     >
     </div>
-    <!-- Bottom vignette -->
+    <!-- Bottom wash -->
     <div
-      class="absolute inset-x-0 bottom-0 h-[40vh]"
-      style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"
+      class="absolute inset-x-0 bottom-0 h-[50vh]"
+      style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"
     >
     </div>
-    <!-- Soft red orb behind logo -->
+    <!-- Soft red orb — drifts continuously (DESIGN.md: subtle motion) -->
     <div
-      class="absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yaja-red/12 blur-[120px] anim-fade-in-slow"
+      class="absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] rounded-full bg-yaja-red/14 blur-[120px] anim-orb-drift"
     >
     </div>
-    <!-- Faint diagonal lines for cinematic texture -->
+    <!-- Secondary orb for depth -->
+    <div
+      class="absolute right-[10%] bottom-[15%] h-[35vmin] w-[35vmin] rounded-full bg-yaja-red/8 blur-[100px] anim-orb-drift"
+      style="animation-delay: -7s; animation-duration: 18s;"
+    >
+    </div>
+    <!-- Faint diagonal lines (cinematic film texture) -->
     <div
       class="absolute inset-0 opacity-[0.04]"
       style="background-image: linear-gradient(135deg, transparent 49.5%, white 49.5% 50.5%, transparent 50.5%); background-size: 32px 32px;"
@@ -42,9 +49,10 @@ const letters = ["Y", "A", "J", "A"];
     </div>
   </div>
 
-  <!-- ========== STAGE (centered column, OASIZ vertical rhythm) ========== -->
+  <!-- ========== STAGE (centered column, OASIZ vertical rhythm)
+       The whole stage is parallax-faded as user scrolls past hero. -->
   <div
-    class="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center justify-center px-6 py-24 text-center md:px-10 md:py-32"
+    class="hero-stage scroll-fade-out relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center justify-center px-6 py-24 text-center md:px-10 md:py-32"
   >
     <!-- Eyebrow tag -->
     <p
@@ -72,27 +80,32 @@ const letters = ["Y", "A", "J", "A"];
         ))
       }
 
-      <!-- Fire flame inline next to YAJA wordmark -->
+      <!-- Fire flame inline next to YAJA wordmark.
+           After entrance, breathes continuously to suggest life. -->
       <img
         src="/logos/fire-symbol/red-symbol.png"
         alt=""
         aria-hidden="true"
         class="hero-flame ml-3 inline-block self-center"
-        style="width: clamp(50px, 9vw, 130px); height: auto; animation-delay: 0.85s;"
+        style="width: clamp(50px, 9vw, 130px); height: auto;"
       />
     </div>
 
-    <!-- Korean headline -->
+    <!-- Korean headline. Latin "No.1" is wrapped in font-num so it
+         renders in Nohemi while the Korean uses Pretendard. -->
     <h1
-      class="hero-headline anim-fade-in mt-12 max-w-[28ch] font-black leading-[1.2] tracking-[-0.01em] md:mt-16"
+      class="hero-headline anim-fade-in mt-12 max-w-[28ch] font-extrabold leading-[1.2] tracking-[-0.01em] md:mt-16"
       style="font-size: clamp(20px, 2.6vw, 40px); animation-delay: 1.0s;"
     >
-      대한민국 No.1 <span class="text-yaja-red">숏폼 드라마</span> 스튜디오
+      <span class="font-kr">대한민국</span>
+      <span class="font-num font-black">No.1</span>
+      <span class="font-kr text-yaja-red">숏폼 드라마</span>
+      <span class="font-kr">스튜디오</span>
     </h1>
 
-    <!-- Sub copy -->
+    <!-- Sub copy (pure Korean → Pretendard) -->
     <p
-      class="anim-fade-in mt-6 max-w-[44ch] text-yaja-gray md:text-lg"
+      class="anim-fade-in font-kr mt-6 max-w-[44ch] text-yaja-gray md:text-lg"
       style="animation-delay: 1.15s;"
     >
       고객님의 성장을 이끄는 최적의 파트너로
@@ -176,31 +189,28 @@ const letters = ["Y", "A", "J", "A"];
     }
   }
 
-  /* ===== Flame inline ===== */
+  /* ===== Flame inline =====
+   * Entrance then continuous breathing. We delay the breathe by 1.8s
+   * so it starts the moment the entrance finishes. */
   .hero-flame {
     opacity: 0;
-    transform: scale(0.6) rotate(-8deg);
-    animation: hero-flame-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
     filter: drop-shadow(0 0 24px rgba(255, 72, 72, 0.5));
+    animation:
+      hero-flame-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.85s both,
+      flame-breathe 5s ease-in-out 1.8s infinite;
   }
 
   @keyframes hero-flame-in {
     from {
       opacity: 0;
       transform: scale(0.6) rotate(-8deg);
+      filter: drop-shadow(0 0 6px rgba(255, 72, 72, 0));
     }
     to {
       opacity: 1;
       transform: scale(1) rotate(0);
+      filter: drop-shadow(0 0 24px rgba(255, 72, 72, 0.5));
     }
-  }
-
-  /* Subtle continuous flicker on the flame after entrance */
-  .hero-flame {
-    animation-fill-mode: both;
-  }
-  .hero-flame::before {
-    content: "";
   }
 
   /* Eyebrow drift-in */

@@ -109,9 +109,12 @@
   --color-yaja-warning: #F59E0B;
   --color-yaja-error: #EF4444;
 
-  /* Fonts — Korean primary, Nohemi for numbers/Latin */
+  /* Fonts (DESIGN.md §3): Nohemi-first so Latin & numbers always
+   * render in Nohemi while Korean characters automatically fall
+   * back to Pretendard via per-character font fallback. */
   --font-display: "Nohemi", "Pretendard", system-ui, sans-serif;
-  --font-sans: "Pretendard", "Nohemi", system-ui, sans-serif;
+  --font-sans: "Nohemi", "Pretendard", system-ui, sans-serif;
+  --font-kr: "Pretendard", "Nohemi", system-ui, sans-serif;
 
   /* Radius (DESIGN.md §5.2: 4-8px) */
   --radius-sm: 4px;
@@ -145,6 +148,27 @@ body {
   letter-spacing: -0.02em;
 }
 
+/* Pure-Korean blocks. Use when Latin shouldn't appear / should look
+ * like body Korean copy (slightly looser tracking). */
+.font-kr {
+  font-family: var(--font-kr);
+  letter-spacing: 0;
+}
+
+/* ========== FILM GRAIN (subtle texture overlay, OASIZ feel)
+ * z-index 0 keeps it under all real content. mix-blend-mode is
+ * disabled — empirically it captured the whole page as black on
+ * some renderers, and we don't need that complexity. */
+.film-grain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 160px 160px;
+}
+
 /* ========== ANIMATIONS ========== */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(24px); }
@@ -161,6 +185,16 @@ body {
   100% { transform: scale(1.1) translate(-1.5%, -1.5%); }
 }
 
+@keyframes flame-breathe {
+  0%, 100% { transform: scale(1) rotate(0deg);   filter: drop-shadow(0 0 18px rgba(255,72,72,0.4)); }
+  50%      { transform: scale(1.04) rotate(0.5deg); filter: drop-shadow(0 0 32px rgba(255,72,72,0.7)); }
+}
+
+@keyframes orb-drift {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50%      { transform: translate(-46%, -54%) scale(1.08); }
+}
+
 .anim-fade-in {
   animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -173,18 +207,61 @@ body {
   animation: ken-burns 24s ease-in-out infinite alternate;
 }
 
-/* Reveal on scroll — applied via IntersectionObserver in Layout.astro */
+.anim-flame-breathe {
+  animation: flame-breathe 5s ease-in-out infinite;
+}
+
+.anim-orb-drift {
+  animation: orb-drift 14s ease-in-out infinite;
+}
+
+/* ========== SCROLL-DRIVEN ANIMATIONS (OASIZ-style parallax) ========== */
+/* Modern browsers (Chrome 115+, Safari 17.5+) execute these natively
+ * via animation-timeline: scroll(). Older browsers simply skip them
+ * and the page degrades to a static, perfectly-readable layout. */
+@supports (animation-timeline: scroll()) {
+  @keyframes hero-bg-parallax {
+    to { transform: translate3d(0, -22vh, 0); }
+  }
+  @keyframes hero-content-fade {
+    0%   { opacity: 1; transform: translateY(0); filter: blur(0); }
+    60%  { opacity: 0.6; transform: translateY(-30px); filter: blur(2px); }
+    100% { opacity: 0; transform: translateY(-80px); filter: blur(8px); }
+  }
+  @keyframes section-rise {
+    from { opacity: 0; transform: translateY(60px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .scroll-parallax {
+    animation: hero-bg-parallax linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 0 100vh;
+  }
+  .scroll-fade-out {
+    animation: hero-content-fade linear both;
+    animation-timeline: scroll(root block);
+    animation-range: 20vh 90vh;
+  }
+}
+
+/* ========== SCROLL REVEAL (IntersectionObserver fallback for any
+ *                        section, slow + elegant) ========== */
 .reveal {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(48px);
   transition:
-    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: blur(6px);
+  will-change: opacity, transform, filter;
 }
 
 .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
+  filter: blur(0);
 }
 
 /* Stagger children when parent has .reveal-stagger */
