@@ -113,9 +113,8 @@ export const projects = [
     description:
       "에피소드 단위로 제품을 자연스럽게 녹여낸 브랜디드 시리즈. 단일 PR로 1,234만 조회 달성.",
     tags: ["MZ 도달", "숏폼 드라마", "브랜디드"],
-    /** Video URL relative to /public. Drop file as
-     * /public/videos/<slug>.mp4 then set this string. */
-    video: "" as string,
+    /** Vertical (9:16) video shown in card. */
+    video: "/videos/projects/vaseline.mp4" as string,
     metric: {
       label: "1PR 총 조회수",
       value: "12,342,129",
@@ -130,7 +129,7 @@ export const projects = [
     description:
       "야자캠프 인기 시리즈에 제품을 자연스럽게 노출. 2 에피소드로 4,544,123회 조회.",
     tags: ["테크", "MZ 도달", "PPL"],
-    video: "" as string,
+    video: "/videos/projects/samsung.mp4" as string,
     metric: {
       label: "1PR 총 조회수",
       value: "4,544,123",
@@ -145,7 +144,7 @@ export const projects = [
     description:
       "크리에이티브 콘텐츠와 자연스러운 결합. 단일 에피소드 320만 조회.",
     tags: ["크리에이티브", "Z세대", "PPL"],
-    video: "" as string,
+    video: "/videos/projects/adobe.mp4" as string,
     metric: {
       label: "1PR 총 조회수",
       value: "3,204,010",
@@ -160,7 +159,7 @@ export const projects = [
     description:
       "기획 · 제작 · 운영 풀-스택. 운영 1개월 시점 평균 조회수 315만 달성.",
     tags: ["계정 육성", "B2B", "글로벌"],
-    video: "" as string,
+    video: "/videos/projects/persol.mp4" as string,
     metric: {
       label: "평균 조회수 (1달)",
       value: "3,150,124",

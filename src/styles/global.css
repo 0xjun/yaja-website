@@ -217,15 +217,14 @@ body {
   animation: orb-drift 14s ease-in-out infinite;
 }
 
-/* ========== SCROLL REVEAL — initial hidden state for GSAP to animate
+/* ========== SCROLL REVEAL — initial hidden state for GSAP to animate.
  * GSAP ScrollTrigger inside SmoothScroll.astro reads these and runs
- * the fromTo. CSS provides the initial-state-on-SSR so users see no
- * flash of unstyled content while JS warms up. */
+ * the fromTo. No CSS transitions / filters — keep the reveal trendy
+ * and clean (subtle slide+fade only). */
 .reveal {
   opacity: 0;
-  transform: translate3d(0, 48px, 0);
-  filter: blur(8px);
-  will-change: opacity, transform, filter;
+  transform: translate3d(0, 32px, 0);
+  will-change: opacity, transform;
 }
 
 /* If JavaScript is disabled, show content anyway. */
@@ -233,7 +232,6 @@ body {
 html:not(.lenis) .reveal {
   opacity: 1;
   transform: none;
-  filter: none;
 }
 
 /* Reduce motion preference */

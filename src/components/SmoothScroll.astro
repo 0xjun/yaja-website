@@ -143,18 +143,17 @@
       });
     }
 
-    // 2. Per-section reveal — GSAP fromTo drives the blur-fade enter.
+    // 2. Per-section reveal — clean slide+fade (no blur, trendy).
     document.querySelectorAll<HTMLElement>(".reveal").forEach((el) => {
       gsap.fromTo(
         el,
-        { opacity: 0, y: 60, filter: "blur(8px)" },
+        { opacity: 0, y: 32 },
         {
           opacity: 1,
           y: 0,
-          filter: "blur(0px)",
-          duration: 1.2,
-          ease: "power3.out",
-          scrollTrigger: { trigger: el, start: "top 85%" },
+          duration: 0.9,
+          ease: "expo.out",
+          scrollTrigger: { trigger: el, start: "top 88%" },
           onStart: () => el.classList.add("is-visible"),
         },
       );
@@ -164,14 +163,14 @@
     document.querySelectorAll<HTMLElement>(".reveal-stagger").forEach((parent) => {
       gsap.fromTo(
         parent.children,
-        { opacity: 0, y: 40 },
+        { opacity: 0, y: 24 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.9,
-          stagger: 0.08,
-          ease: "power3.out",
-          scrollTrigger: { trigger: parent, start: "top 85%" },
+          duration: 0.7,
+          stagger: 0.06,
+          ease: "expo.out",
+          scrollTrigger: { trigger: parent, start: "top 88%" },
         },
       );
     });
