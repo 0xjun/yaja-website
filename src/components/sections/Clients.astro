@@ -1,0 +1,61 @@
+---
+import { clients, awards } from "@/lib/site";
+---
+
+<section
+  id="clients"
+  class="relative border-t border-white/5 bg-yaja-dark py-24 md:py-32"
+  aria-label="Trusted by"
+>
+  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
+    <div class="reveal">
+      <p
+        class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
+      >
+        Trusted by
+      </p>
+      <h2 class="mt-4 max-w-[24ch] text-3xl font-extrabold leading-tight md:text-5xl">
+        함께한 브랜드
+      </h2>
+    </div>
+
+    <div
+      class="reveal reveal-stagger mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-16 md:grid-cols-5"
+    >
+      {
+        clients.map((c) => (
+          <div class="flex aspect-[3/2] items-center justify-center bg-yaja-dark p-6 transition-colors hover:bg-yaja-charcoal">
+            <span class="font-num text-center text-base font-bold tracking-tight text-yaja-white md:text-lg">
+              {c}
+            </span>
+          </div>
+        ))
+      }
+    </div>
+
+    <!-- Award -->
+    <div
+      class="reveal mt-16 flex flex-col items-start gap-6 rounded-lg border border-yaja-red/30 bg-gradient-to-r from-yaja-red/10 via-yaja-red/5 to-transparent p-8 md:mt-20 md:flex-row md:items-center md:p-10"
+    >
+      <div
+        class="font-num flex h-16 w-16 shrink-0 items-center justify-center rounded-full border-2 border-yaja-red bg-yaja-red/10 text-2xl font-black text-yaja-red"
+        aria-hidden="true"
+      >
+        ★
+      </div>
+      <div class="flex-1">
+        {
+          awards.map((a) => (
+            <>
+              <p class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+                Award · {a.year}
+              </p>
+              <p class="mt-2 text-xl font-extrabold md:text-2xl">{a.title}</p>
+              <p class="text-yaja-gray-mid md:text-lg">{a.category}</p>
+            </>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,53 @@
+---
+import { site } from "@/lib/site";
+---
+
+<section
+  id="contact"
+  class="relative overflow-hidden bg-yaja-dark py-32 md:py-44"
+  aria-label="Contact"
+>
+  <!-- Ambient red glow -->
+  <div class="pointer-events-none absolute inset-0 -z-10">
+    <div
+      class="absolute left-1/2 top-1/2 h-[80vh] w-[80vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yaja-red/15 blur-[140px]"
+    >
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-[1440px] px-6 text-center md:px-10">
+    <p
+      class="reveal font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
+    >
+      Contact
+    </p>
+    <h2
+      class="reveal mx-auto mt-6 max-w-[18ch] text-4xl font-black leading-tight tracking-tight md:text-6xl lg:text-7xl"
+    >
+      함께
+      <span class="text-yaja-red">새로운 IP</span>를<br />
+      만들어 보세요.
+    </h2>
+    <p class="reveal mx-auto mt-8 max-w-[44ch] text-yaja-gray-mid md:text-lg">
+      브랜드 캠페인부터 자체 IP 협업까지, 어떤 단계에 계시든 가장 효과적인
+      방법을 함께 설계합니다.
+    </p>
+
+    <div class="reveal mt-12 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href={`mailto:${site.email}`}
+        class="font-num rounded-md bg-yaja-red px-7 py-4 text-sm font-bold tracking-[0.06em] text-yaja-white transition-transform hover:-translate-y-0.5"
+      >
+        {site.email}
+      </a>
+      <a
+        href="https://www.tiktok.com/@yajacamp"
+        target="_blank"
+        rel="noopener"
+        class="font-num rounded-md border border-white/20 px-7 py-4 text-sm font-bold tracking-[0.06em] text-yaja-white transition-colors hover:border-yaja-red hover:text-yaja-red"
+      >
+        @yajacamp 보기
+      </a>
+    </div>
+  </div>
+</section>

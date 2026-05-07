@@ -1,43 +1,86 @@
-# Astro Starter Kit: Minimal
+# YAJA Inc. — 公式コーポレートサイト
+
+> **대한민국 No.1 숏폼 드라마 스튜디오**
+> https://yajacamp.com (deployment pending)
+
+## 構成 (Tech Stack)
+
+| Layer | Tech |
+|---|---|
+| フレームワーク | [Astro 6](https://astro.build) — 静的サイト生成 |
+| UI ライブラリ | React 19（インタラクティブな部品のみ） |
+| スタイル | Tailwind CSS v4 |
+| ホスティング | Vercel（CDN 配信、無料枠） |
+| ドメイン | yajacamp.com（GABIA 管理） |
+
+## デザインシステム
+
+`reference/DESIGN.md` に完全準拠。
+
+- カラー: `#1E1E1E` ベース / `#FFFFFF` テキスト / `#FF4848` (YAJA Red) アクセント
+- フォント: Nohemi (英・数字) / Pretendard (韓国語)
+- スタイル: フラット・シネマティック・大余白
+
+## 開発手順
 
 ```sh
-npm create astro@latest -- --template minimal
+cd /Users/yoojunkang/Documents/YAJA/yaja-website
+npm install      # 初回のみ
+npm run dev      # http://localhost:4321
+npm run build    # 本番ビルド (./dist 出力)
+npm run preview  # 本番ビルドのプレビュー
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## ファイル構成
 
-## 🚀 Project Structure
+```
+src/
+├── layouts/Layout.astro       共通レイアウト・<head> 設定
+├── pages/index.astro          トップページ
+├── lib/
+│   ├── site.ts                ★ 全コンテンツ・数字の単一管理ファイル
+│   └── utils.ts               ヘルパー関数
+├── components/
+│   ├── Header.astro           固定ナビゲーション
+│   ├── Footer.astro
+│   ├── CountUp.tsx            数字カウントアップ（React 島）
+│   └── sections/              ホームページ各セクション
+│       ├── Hero.astro
+│       ├── Stats.astro
+│       ├── Accounts.astro
+│       ├── Services.astro
+│       ├── Works.astro
+│       ├── Clients.astro
+│       ├── Founders.astro
+│       └── Contact.astro
+└── styles/global.css          Tailwind v4 テーマ + フォント定義
 
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+public/
+├── fonts/                     Nohemi (woff) / Pretendard (otf)
+└── logos/                     YAJA ロゴ各種
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 更新フロー
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+数字や文章を変更したいとき → **`src/lib/site.ts` を編集**するだけ。
+全セクションが自動で再描画されます。
 
-Any static assets, like images, can be placed in the `public/` directory.
+例: 累計再生数を 19억 → 25억 に変える
+```ts
+{ label: "누적 조회수", value: "25억", numeric: 25, unit: "억" },
+```
 
-## 🧞 Commands
+## 公開（デプロイ）
 
-All commands are run from the root of the project, from a terminal:
+GitHub に push すると Vercel が自動でビルド・公開します。
+本番反映までの目安: **30 秒〜2 分**。
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## デザイン参考
 
-## 👀 Want to learn more?
+- [oasiz.org](https://oasiz.org) — 数値 KPI の見せ方
+- [gokkoclub.jp](https://gokkoclub.jp) — 詩的ヘッドコピー
+- [playliststudio.kr](http://playliststudio.kr) — ブランドハブ構造
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## ライセンス
+
+(c) YAJA Inc. — All rights reserved.

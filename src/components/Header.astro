@@ -1,0 +1,67 @@
+---
+const navItems = [
+  { label: "WORKS", href: "#works" },
+  { label: "SERVICES", href: "#services" },
+  { label: "ABOUT", href: "#about" },
+  { label: "CONTACT", href: "#contact" },
+];
+---
+
+<header
+  class="fixed inset-x-0 top-0 z-50 transition-colors duration-300"
+  data-header
+>
+  <div
+    class="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 md:px-10"
+  >
+    <a href="/" class="flex items-center gap-2" aria-label="YAJA Inc.">
+      <img
+        src="/logos/fire-symbol/red-symbol.png"
+        alt="YAJA"
+        width="32"
+        height="32"
+        class="h-7 w-auto"
+      />
+      <span
+        class="font-num text-[15px] font-extrabold tracking-tight text-yaja-white"
+      >
+        YAJA
+      </span>
+    </a>
+
+    <nav class="hidden items-center gap-8 md:flex">
+      {
+        navItems.map((item) => (
+          <a
+            href={item.href}
+            class="font-num text-[13px] font-semibold tracking-[0.08em] text-yaja-white/80 transition-colors hover:text-yaja-red"
+          >
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <a
+      href="#contact"
+      class="hidden rounded-md border border-yaja-red bg-yaja-red px-4 py-2 font-num text-[12px] font-bold tracking-[0.08em] text-yaja-white transition-all hover:bg-transparent hover:text-yaja-red md:inline-block"
+    >
+      문의하기
+    </a>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector("[data-header]") as HTMLElement | null;
+  if (header) {
+    const onScroll = () => {
+      if (window.scrollY > 40) {
+        header.classList.add("bg-yaja-dark/90", "backdrop-blur-md");
+      } else {
+        header.classList.remove("bg-yaja-dark/90", "backdrop-blur-md");
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+  }
+</script>

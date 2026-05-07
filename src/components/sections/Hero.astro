@@ -1,0 +1,101 @@
+---
+import { hero } from "@/lib/site";
+---
+
+<section
+  class="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-yaja-dark"
+  aria-label="Hero"
+>
+  <!-- Background — subtle ambient red glow + grain -->
+  <div class="pointer-events-none absolute inset-0 -z-10">
+    <div
+      class="absolute -left-[20%] top-[10%] h-[60vh] w-[60vh] rounded-full bg-yaja-red/15 blur-[120px] anim-fade-in-slow"
+    >
+    </div>
+    <div
+      class="absolute -right-[15%] bottom-[5%] h-[50vh] w-[50vh] rounded-full bg-yaja-red/10 blur-[140px] anim-fade-in-slow"
+      style="animation-delay: 0.3s"
+    >
+    </div>
+    <!-- Subtle diagonal grid texture (DESIGN.md: cinematic high-contrast) -->
+    <div
+      class="absolute inset-0 opacity-[0.07]"
+      style="background-image: linear-gradient(135deg, transparent 49.5%, white 49.5% 50.5%, transparent 50.5%); background-size: 24px 24px;"
+    >
+    </div>
+    <!-- Vignette -->
+    <div
+      class="absolute inset-0"
+      style="background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.7) 100%);"
+    >
+    </div>
+  </div>
+
+  <div class="mx-auto w-full max-w-[1440px] px-6 pt-32 pb-20 md:px-10 md:pt-40 md:pb-28">
+    <!-- Eyebrow -->
+    <p
+      class="anim-fade-in font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
+      style="animation-delay: 0.1s"
+    >
+      {hero.eyebrow}
+    </p>
+
+    <!-- Headline -->
+    <h1
+      class="mt-6 max-w-[18ch] text-[44px] font-black leading-[1.05] tracking-tight md:text-[88px] lg:text-[112px]"
+    >
+      <span
+        class="anim-fade-in block text-yaja-red"
+        style="animation-delay: 0.25s"
+      >
+        {hero.headline[0]}
+      </span>
+      <span class="anim-fade-in block" style="animation-delay: 0.45s">
+        {hero.headline[1]}
+      </span>
+    </h1>
+
+    <!-- Subheadline -->
+    <p
+      class="anim-fade-in mt-8 max-w-[36ch] text-base text-yaja-gray-mid md:text-xl"
+      style="animation-delay: 0.7s"
+    >
+      {hero.subhead}
+    </p>
+
+    <!-- CTAs -->
+    <div
+      class="anim-fade-in mt-10 flex flex-wrap gap-3"
+      style="animation-delay: 0.9s"
+    >
+      <a
+        href="#works"
+        class="rounded-md bg-yaja-red px-6 py-3 font-num text-[13px] font-bold tracking-[0.08em] text-yaja-white transition-transform hover:-translate-y-0.5"
+      >
+        WORKS 보기
+      </a>
+      <a
+        href="#contact"
+        class="rounded-md border border-white/20 px-6 py-3 font-num text-[13px] font-bold tracking-[0.08em] text-yaja-white transition-colors hover:border-yaja-red hover:text-yaja-red"
+      >
+        문의하기
+      </a>
+    </div>
+  </div>
+
+  <!-- Scroll cue -->
+  <div
+    class="anim-fade-in absolute bottom-8 left-1/2 -translate-x-1/2"
+    style="animation-delay: 1.4s"
+    aria-hidden="true"
+  >
+    <div class="flex flex-col items-center gap-2 text-yaja-gray-mid">
+      <span
+        class="font-num text-[10px] font-semibold uppercase tracking-[0.18em]"
+      >
+        Scroll
+      </span>
+      <span class="block h-8 w-px animate-pulse bg-current"></span>
+    </div>
+  </div>
+</section>

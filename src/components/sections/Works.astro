@@ -1,0 +1,66 @@
+---
+import { works } from "@/lib/site";
+---
+
+<section
+  id="works"
+  class="bg-yaja-dark py-24 md:py-32"
+  aria-label="Selected works"
+>
+  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
+    <div class="reveal">
+      <p
+        class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
+      >
+        04 — Works
+      </p>
+      <h2 class="mt-4 max-w-[28ch] text-3xl font-extrabold leading-tight md:text-5xl">
+        검증된 성과
+      </h2>
+      <p class="mt-5 max-w-[52ch] text-yaja-gray-mid md:text-lg">
+        글로벌 브랜드와의 협업 사례입니다. 모든 캠페인은 기획부터 운영까지
+        YAJA가 책임집니다.
+      </p>
+    </div>
+
+    <ul
+      class="reveal reveal-stagger mt-12 divide-y divide-white/10 border-y border-white/10 md:mt-16"
+    >
+      {
+        works.map((work) => (
+          <li class="grid grid-cols-1 gap-2 py-7 md:grid-cols-12 md:items-baseline md:gap-6 md:py-9">
+            <div class="md:col-span-3">
+              <p class="font-num text-xl font-extrabold tracking-tight md:text-2xl">
+                {work.brand}
+              </p>
+            </div>
+            <div class="md:col-span-3">
+              <p class="text-sm text-yaja-gray-mid md:text-base">
+                {work.type}
+              </p>
+              <p class="font-num mt-1 text-[11px] uppercase tracking-[0.14em] text-yaja-gray">
+                {work.detail}
+              </p>
+            </div>
+            <div class="md:col-span-3">
+              <p class="font-num text-sm text-yaja-gray">
+                {work.handle}
+              </p>
+            </div>
+            <div class="md:col-span-3 md:text-right">
+              <p class="font-num text-3xl font-black tracking-tight md:text-4xl">
+                {work.views}
+                <span class="ml-1 text-sm font-semibold text-yaja-gray-mid">
+                  회
+                </span>
+              </p>
+              <p class="font-num text-[10px] uppercase tracking-[0.14em] text-yaja-gray md:text-right">
+                Total Views
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

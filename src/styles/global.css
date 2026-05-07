@@ -1,0 +1,210 @@
+@import "tailwindcss";
+
+/* ========== FONTS ========== */
+/* Nohemi — English & numbers (DESIGN.md §3.1) */
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-Light.woff") format("woff");
+}
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-Regular.woff") format("woff");
+}
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-SemiBold.woff") format("woff");
+}
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-Bold.woff") format("woff");
+}
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-ExtraBold.woff") format("woff");
+}
+@font-face {
+  font-family: "Nohemi";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/fonts/nohemi/Nohemi-Black.woff") format("woff");
+}
+
+/* Pretendard — Korean (DESIGN.md §3.1) */
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-Light.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-Regular.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-SemiBold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-Bold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-ExtraBold.otf") format("opentype");
+}
+@font-face {
+  font-family: "Pretendard";
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url("/fonts/pretendard/Pretendard-Black.otf") format("opentype");
+}
+
+/* ========== TAILWIND THEME (DESIGN.md §1, §3) ========== */
+@theme {
+  /* Brand colors */
+  --color-yaja-red: #FF4848;
+  --color-yaja-dark: #1E1E1E;
+  --color-yaja-white: #FFFFFF;
+
+  /* Neutrals */
+  --color-yaja-charcoal: #333333;
+  --color-yaja-gray-mid: #6E7380;
+  --color-yaja-gray: #9CA3AF;
+  --color-yaja-border: #C8CDD7;
+  --color-yaja-border-light: #E5E7EB;
+  --color-yaja-bg-alt: #F9FAFD;
+
+  /* Functional */
+  --color-yaja-success: #10B981;
+  --color-yaja-warning: #F59E0B;
+  --color-yaja-error: #EF4444;
+
+  /* Fonts — Korean primary, Nohemi for numbers/Latin */
+  --font-display: "Nohemi", "Pretendard", system-ui, sans-serif;
+  --font-sans: "Pretendard", "Nohemi", system-ui, sans-serif;
+
+  /* Radius (DESIGN.md §5.2: 4-8px) */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+}
+
+/* ========== BASE ========== */
+:root {
+  color-scheme: dark;
+}
+
+html {
+  background-color: var(--color-yaja-dark);
+  color: var(--color-yaja-white);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-yaja-dark);
+  color: var(--color-yaja-white);
+}
+
+/* Numbers always render with Nohemi tabular-nums */
+.font-num {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ========== ANIMATIONS ========== */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in-slow {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ken-burns {
+  0%   { transform: scale(1) translate(0, 0); }
+  100% { transform: scale(1.1) translate(-1.5%, -1.5%); }
+}
+
+.anim-fade-in {
+  animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.anim-fade-in-slow {
+  animation: fade-in-slow 1.6s ease both;
+}
+
+.anim-ken-burns {
+  animation: ken-burns 24s ease-in-out infinite alternate;
+}
+
+/* Reveal on scroll — applied via IntersectionObserver in Layout.astro */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children when parent has .reveal-stagger */
+.reveal-stagger > * { transition-delay: 0ms; }
+.reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0ms; }
+.reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 100ms; }
+.reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 200ms; }
+.reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 300ms; }
+.reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 400ms; }
+.reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 500ms; }
+
+/* Reduce motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .anim-fade-in,
+  .anim-fade-in-slow,
+  .anim-ken-burns,
+  .reveal {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

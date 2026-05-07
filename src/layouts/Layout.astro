@@ -1,0 +1,78 @@
+---
+import "@/styles/global.css";
+import { site } from "@/lib/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${site.name} — ${site.description}`,
+  description = site.description,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={site.url} />
+
+    <!-- Theme color (DESIGN.md base dark) -->
+    <meta name="theme-color" content="#1E1E1E" />
+
+    <!-- Favicons (will replace with actual files) -->
+    <link rel="icon" type="image/png" href="/logos/fire-symbol/red-symbol.png" />
+    <link rel="apple-touch-icon" href="/logos/fire-symbol/red-symbol.png" />
+
+    <!-- Preload critical fonts to avoid FOUT in hero -->
+    <link
+      rel="preload"
+      href="/fonts/nohemi/Nohemi-Black.woff"
+      as="font"
+      type="font/woff"
+      crossorigin
+    />
+    <link
+      rel="preload"
+      href="/fonts/pretendard/Pretendard-Bold.otf"
+      as="font"
+      type="font/otf"
+      crossorigin
+    />
+  </head>
+
+  <body class="bg-yaja-dark text-yaja-white antialiased">
+    <slot />
+
+    <!-- Reveal-on-scroll observer (works for any element with .reveal) -->
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15, rootMargin: "0px 0px -10% 0px" }
+      );
+
+      document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+    </script>
+  </body>
+</html>
