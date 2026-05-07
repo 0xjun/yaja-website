@@ -1,0 +1,54 @@
+---
+import { partnership } from "@/lib/site";
+
+/**
+ * OASIZ §8 mirror — partnership banner.
+ * OASIZ uses ByteDance/TikTok Creative Exchange. YAJA uses
+ * TikTok Awards 2024 Video of the Year as equivalent credibility marker.
+ */
+---
+
+<section
+  id="partnership"
+  class="relative bg-yaja-dark py-24 md:py-32"
+  aria-label="Partnership"
+>
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <div
+      class="reveal grid gap-10 overflow-hidden rounded-lg border border-yaja-red/30 bg-gradient-to-r from-yaja-red/10 via-yaja-red/5 to-transparent p-10 md:grid-cols-[1fr_auto] md:items-center md:gap-16 md:p-16"
+    >
+      <div>
+        <p class="font-num text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red">
+          {partnership.eyebrow}
+        </p>
+        <p
+          class="mt-6 font-extrabold leading-[1.2] tracking-[-0.015em]"
+          style="font-size: clamp(20px, 2.4vw, 32px);"
+        >
+          {partnership.copy}
+        </p>
+        <p class="mt-6 max-w-[52ch] text-yaja-gray-mid md:text-lg">
+          {partnership.detail}
+        </p>
+      </div>
+
+      <!-- Award badge -->
+      <div class="flex shrink-0 items-center gap-5 md:flex-col md:gap-3 md:text-center">
+        <div
+          class="font-num flex h-24 w-24 items-center justify-center rounded-full border-2 border-yaja-red bg-yaja-red/15 text-4xl font-black text-yaja-red md:h-32 md:w-32 md:text-5xl"
+          aria-hidden="true"
+        >
+          ★
+        </div>
+        <div class="md:mt-2">
+          <p class="font-num text-base font-extrabold md:text-lg">
+            {partnership.award.title}
+          </p>
+          <p class="font-num text-xs text-yaja-gray-mid md:text-sm">
+            {partnership.award.category} · {partnership.award.year}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

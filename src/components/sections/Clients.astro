@@ -1,84 +1,42 @@
 ---
-import Marquee from "@/components/Marquee.astro";
-import { clients, awards } from "@/lib/site";
+import { clients } from "@/lib/site";
+
+/**
+ * OASIZ §7 mirror — static client grid (3×3).
+ * No marquee; minimalist tiled layout reflects OASIZ's restrained aesthetic.
+ */
 ---
 
 <section
   id="clients"
-  class="relative border-t border-white/5 bg-yaja-dark py-24 md:py-32"
-  aria-label="Trusted by"
+  class="relative border-t border-white/8 bg-yaja-dark py-24 md:py-32"
+  aria-label="Clients"
 >
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div class="reveal flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-      <div>
-        <p
-          class="font-num text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red"
-        >
-          Trusted by
-        </p>
-        <h2 class="mt-4 max-w-[24ch] text-3xl font-extrabold leading-tight md:text-5xl">
-          글로벌 브랜드와 함께
-        </h2>
-      </div>
-      <p class="max-w-[40ch] text-yaja-gray-mid md:text-right">
-        80개 이상의 브랜드와 캠페인을 진행했습니다.
-      </p>
-    </div>
-  </div>
-
-  <!-- Infinite marquee — runs full-bleed beyond the container -->
-  <div class="reveal mt-14 md:mt-20">
-    <Marquee speed={50}>
-      {
-        clients.map((c) => (
-          <span
-            class="font-num inline-flex items-center gap-12 px-8 text-3xl font-extrabold tracking-tight text-yaja-white/90 transition-colors hover:text-yaja-red md:text-5xl lg:text-6xl"
-          >
-            {c}
-            <span class="block h-2 w-2 rounded-full bg-yaja-red" aria-hidden="true" />
-          </span>
-        ))
-      }
-    </Marquee>
-  </div>
-  <div class="mt-2 opacity-50">
-    <Marquee speed={70} reverse>
-      {
-        clients.map((c) => (
-          <span class="font-num inline-flex items-center gap-12 px-8 text-2xl font-bold tracking-tight text-yaja-white/40 md:text-3xl">
-            {c}
-            <span class="block h-1.5 w-1.5 rounded-full bg-yaja-red/60" aria-hidden="true" />
-          </span>
-        ))
-      }
-    </Marquee>
-  </div>
-
-  <!-- Award card -->
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div
-      class="reveal mt-20 flex flex-col items-start gap-6 overflow-hidden rounded-lg border border-yaja-red/30 bg-gradient-to-r from-yaja-red/15 via-yaja-red/5 to-transparent p-8 md:flex-row md:items-center md:gap-10 md:p-12"
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <p
+      class="reveal font-num text-center text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red"
     >
-      <div class="font-num flex h-20 w-20 shrink-0 items-center justify-center rounded-full border-2 border-yaja-red bg-yaja-red/10 text-3xl font-black text-yaja-red md:h-24 md:w-24 md:text-4xl">
-        ★
-      </div>
-      <div class="flex-1">
-        {
-          awards.map((a) => (
-            <>
-              <p class="font-num text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red">
-                Award · {a.year}
-              </p>
-              <p class="mt-3 text-2xl font-extrabold md:text-4xl">{a.title}</p>
-              <p class="text-yaja-gray md:text-xl">{a.category}</p>
-            </>
-          ))
-        }
-      </div>
-      <span
-        class="font-num text-[10px] uppercase tracking-[0.22em] text-yaja-gray md:text-right"
-        >Korea · 2024</span
-      >
+      Clients
+    </p>
+    <h2
+      class="reveal mx-auto mt-6 max-w-[24ch] text-center font-black leading-[1.1] tracking-[-0.02em] md:mt-8"
+      style="font-size: clamp(32px, 5vw, 72px);"
+    >
+      함께한 <span class="text-yaja-red">브랜드</span>
+    </h2>
+
+    <div
+      class="reveal reveal-stagger mx-auto mt-16 grid max-w-[960px] grid-cols-3 gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-20"
+    >
+      {
+        clients.map((c) => (
+          <div class="group flex aspect-[4/3] items-center justify-center bg-yaja-dark p-6 transition-colors hover:bg-yaja-charcoal">
+            <span class="font-num text-center text-sm font-bold tracking-tight text-yaja-white/90 transition-colors group-hover:text-yaja-red md:text-base lg:text-lg">
+              {c}
+            </span>
+          </div>
+        ))
+      }
     </div>
   </div>
 </section>

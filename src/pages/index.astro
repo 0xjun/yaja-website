@@ -1,14 +1,30 @@
 ---
+/**
+ * Home page — mirrors oasiz.org section flow.
+ *
+ * 1. Hero            — center column with logo letters
+ * 2. Stats           — two prominent numbers (OASIZ §2)
+ * 3. Strategy        — mission with × separator (OASIZ §3)
+ * 4. Categories      — 5 ★ bilingual rows (OASIZ §4)
+ * 5. Projects        — 4 case-study cards (OASIZ §5)
+ * 6. Clients         — 3×3 static grid (OASIZ §7)
+ * 7. Partnership     — TikTok Awards banner (OASIZ §8)
+ * 8. Column          — featured article (OASIZ §9)
+ * 9. News            — latest 3 news rows (OASIZ §10)
+ * 10. Contact        — closing CTA
+ */
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
 import Hero from "@/components/sections/Hero.astro";
 import Stats from "@/components/sections/Stats.astro";
-import Accounts from "@/components/sections/Accounts.astro";
-import Services from "@/components/sections/Services.astro";
-import Works from "@/components/sections/Works.astro";
+import Strategy from "@/components/sections/Strategy.astro";
+import Categories from "@/components/sections/Categories.astro";
+import Projects from "@/components/sections/Projects.astro";
 import Clients from "@/components/sections/Clients.astro";
-import Founders from "@/components/sections/Founders.astro";
+import Partnership from "@/components/sections/Partnership.astro";
+import Column from "@/components/sections/Column.astro";
+import News from "@/components/sections/News.astro";
 import Contact from "@/components/sections/Contact.astro";
 ---
 
@@ -17,11 +33,13 @@ import Contact from "@/components/sections/Contact.astro";
   <main>
     <Hero />
     <Stats />
-    <Accounts />
-    <Services />
-    <Works />
+    <Strategy />
+    <Categories />
+    <Projects />
     <Clients />
-    <Founders />
+    <Partnership />
+    <Column />
+    <News />
     <Contact />
   </main>
   <Footer />

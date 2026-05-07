@@ -1,80 +1,48 @@
 ---
 import CountUp from "@/components/CountUp";
-import { stats } from "@/lib/site";
+import { heroStats } from "@/lib/site";
+
+/**
+ * OASIZ §2 mirror — two prominent stats (left/right).
+ * Each card: small description above, mega number, unit, footer note.
+ */
 ---
 
 <section
   id="overview"
-  class="relative overflow-hidden border-y border-white/5 bg-yaja-dark py-24 md:py-40"
-  aria-label="Overview stats"
+  class="relative border-y border-white/8 bg-yaja-dark py-24 md:py-32"
+  aria-label="Numbers"
 >
-  <!-- Mega gradient backdrop -->
-  <div
-    class="pointer-events-none absolute inset-0 -z-10 opacity-60"
-    aria-hidden="true"
-  >
-    <div
-      class="absolute left-1/2 top-1/2 h-[80vh] w-[80vh] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yaja-red/10 blur-[140px]"
-    >
-    </div>
-  </div>
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <p class="reveal font-num text-center text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red">
+      Numbers
+    </p>
 
-  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
-    <!-- Section label -->
-    <div
-      class="reveal flex flex-col gap-4 md:flex-row md:items-end md:justify-between"
-    >
-      <div>
-        <p
-          class="font-num flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red"
-        >
-          <span class="block h-px w-8 bg-yaja-red"></span>
-          01 — Overview
-        </p>
-        <h2
-          class="mt-6 max-w-[20ch] font-black leading-[0.95] tracking-[-0.02em]"
-          style="font-size: clamp(36px, 6vw, 96px);"
-        >
-          숫자로 증명하는<br />
-          <span class="text-yaja-red">대한민국 No.1</span>
-        </h2>
-      </div>
-      <p class="max-w-[40ch] text-yaja-gray-mid md:text-right md:text-lg">
-        모든 데이터는 자체 운영 채널과 클라이언트 캠페인의 누적 실적입니다.
-      </p>
-    </div>
-
-    <!-- Stats grid — massive numbers with red ledger lines -->
-    <div
-      class="reveal reveal-stagger mt-20 grid grid-cols-2 gap-y-16 md:mt-32 md:grid-cols-4 md:gap-x-8"
-    >
+    <div class="reveal reveal-stagger mt-16 grid gap-12 md:mt-24 md:grid-cols-2 md:gap-px md:overflow-hidden md:rounded-lg md:border md:border-white/10 md:bg-white/10">
       {
-        stats.map((stat) => (
-          <div class="group relative">
-            <span
-              class="font-num absolute -top-3 left-0 block text-[10px] font-semibold uppercase tracking-[0.18em] text-yaja-gray"
-            >
-              {stat.label}
-            </span>
+        heroStats.primary.map((stat) => (
+          <div class="bg-yaja-dark p-2 text-center md:p-12 lg:p-16">
+            <p class="text-sm text-yaja-gray-mid md:text-base">{stat.label}</p>
 
-            <div class="mt-6 flex items-baseline gap-1 border-l-[3px] border-yaja-red pl-4 md:pl-6">
+            <div class="mt-6 flex items-baseline justify-center gap-2 md:mt-10">
               <span
-                class="font-num font-black leading-none tracking-[-0.04em] transition-colors group-hover:text-yaja-red"
-                style="font-size: clamp(60px, 10vw, 152px);"
+                class="font-num font-black leading-none tracking-[-0.04em] text-yaja-white"
+                style="font-size: clamp(96px, 14vw, 200px);"
               >
-                <CountUp client:visible to={stat.numeric} />
+                <CountUp client:visible to={stat.value} />
               </span>
               <span
-                class="font-num font-black tracking-tight text-yaja-red"
-                style="font-size: clamp(28px, 4vw, 64px);"
+                class="font-num font-extrabold tracking-[-0.02em] text-yaja-red"
+                style="font-size: clamp(28px, 4vw, 56px);"
               >
                 {stat.unit}
               </span>
             </div>
 
-            <span class="font-num mt-4 block text-[10px] uppercase tracking-[0.18em] text-yaja-gray-mid">
-              {stat.value}
-            </span>
+            <p class="font-num mt-6 text-[11px] uppercase tracking-[0.18em] text-yaja-gray md:mt-10">
+              <span class="text-yaja-red">★</span>
+              <span class="ml-2">{stat.note}</span>
+            </p>
           </div>
         ))
       }

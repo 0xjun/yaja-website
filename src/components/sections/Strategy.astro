@@ -1,0 +1,57 @@
+---
+import { strategy } from "@/lib/site";
+
+/**
+ * OASIZ §3 mirror — central strategy / mission statement.
+ * Headline uses an "×" separator combining two power phrases,
+ * preceded by the YAJA flame symbol on the left.
+ */
+---
+
+<section
+  id="strategy"
+  class="relative bg-yaja-dark py-32 md:py-44"
+  aria-label="Strategy"
+>
+  <div class="mx-auto max-w-[1280px] px-6 text-center md:px-10">
+    <p
+      class="reveal font-num text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red"
+    >
+      {strategy.eyebrow}
+    </p>
+
+    <!-- Brand mark + headline composition (OASIZ-pattern) -->
+    <div
+      class="reveal mt-12 flex flex-col items-center gap-6 md:mt-16 md:flex-row md:justify-center md:gap-10"
+    >
+      <img
+        src="/logos/fire-symbol/red-symbol.png"
+        alt=""
+        aria-hidden="true"
+        class="h-16 w-auto md:h-24 anim-flame-breathe"
+      />
+      <h2
+        class="font-extrabold leading-[1.1] tracking-[-0.025em]"
+        style="font-size: clamp(28px, 4.5vw, 64px);"
+      >
+        <span>{strategy.ko}</span>
+        <span class="mx-3 text-yaja-red md:mx-5">{strategy.separator}</span>
+        <span>{strategy.ko2}</span>
+      </h2>
+    </div>
+
+    <p class="reveal mx-auto mt-10 max-w-[60ch] text-yaja-gray md:mt-14 md:text-lg">
+      {strategy.description}
+    </p>
+
+    <div class="reveal mt-10 md:mt-14">
+      <a
+        href={strategy.cta.href}
+        class="font-num inline-flex items-center gap-2 border-b border-yaja-white/30 pb-2 text-[12px] font-semibold tracking-[0.18em] text-yaja-white transition-colors hover:border-yaja-red hover:text-yaja-red"
+      >
+        {strategy.cta.label}
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</section>

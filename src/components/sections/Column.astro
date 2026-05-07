@@ -1,0 +1,80 @@
+---
+import { column } from "@/lib/site";
+
+/**
+ * OASIZ §9 mirror — Column / blog teaser. One featured card.
+ */
+---
+
+<section
+  id="column"
+  class="relative border-t border-white/8 bg-yaja-dark py-24 md:py-32"
+  aria-label="Column"
+>
+  <div class="mx-auto max-w-[1280px] px-6 md:px-10">
+    <div
+      class="reveal flex items-end justify-between"
+    >
+      <div>
+        <p class="font-num text-[11px] font-semibold uppercase tracking-[0.32em] text-yaja-red">
+          Column
+        </p>
+        <h2
+          class="mt-4 font-black tracking-[-0.02em]"
+          style="font-size: clamp(28px, 4vw, 52px);"
+        >
+          업계 인사이트
+        </h2>
+      </div>
+
+      <a
+        href="#"
+        class="font-num hidden items-center gap-2 text-[11px] font-semibold tracking-[0.18em] text-yaja-gray transition-colors hover:text-yaja-red md:inline-flex"
+      >
+        ALL
+        <span aria-hidden="true">→</span>
+      </a>
+    </div>
+
+    <ul class="reveal reveal-stagger mt-12 grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-16 md:grid-cols-1">
+      {
+        column.map((c) => (
+          <li>
+            <a
+              href={c.href}
+              class="group grid items-center gap-6 bg-yaja-dark p-8 transition-colors hover:bg-yaja-charcoal md:grid-cols-[160px_120px_1fr_auto] md:p-10"
+            >
+              <div class="aspect-[16/10] overflow-hidden rounded bg-gradient-to-br from-yaja-charcoal to-black ring-1 ring-white/5 md:aspect-[4/3]">
+                <div class="flex h-full w-full items-center justify-center">
+                  <img
+                    src="/logos/fire-symbol/red-symbol.png"
+                    alt=""
+                    class="h-1/2 w-auto opacity-30"
+                  />
+                </div>
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <p class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+                  {c.category}
+                </p>
+                <p class="font-num text-sm text-yaja-gray-mid">{c.date}</p>
+              </div>
+
+              <p class="text-lg font-bold leading-snug transition-colors group-hover:text-yaja-red md:text-xl">
+                {c.title}
+              </p>
+
+              <span
+                class="font-num text-yaja-gray-mid transition-colors group-hover:text-yaja-red"
+                aria-hidden="true"
+              >
+                →
+              </span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

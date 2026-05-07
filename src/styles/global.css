@@ -109,12 +109,14 @@
   --color-yaja-warning: #F59E0B;
   --color-yaja-error: #EF4444;
 
-  /* Fonts (DESIGN.md §3): Nohemi-first so Latin & numbers always
-   * render in Nohemi while Korean characters automatically fall
-   * back to Pretendard via per-character font fallback. */
-  --font-display: "Nohemi", "Pretendard", system-ui, sans-serif;
-  --font-sans: "Nohemi", "Pretendard", system-ui, sans-serif;
-  --font-kr: "Pretendard", "Nohemi", system-ui, sans-serif;
+  /* Fonts: Pretendard primary across the entire site (per request).
+   * Pretendard is purpose-built for Korean + Latin pairing, with
+   * cleaner tabular numerals than Nohemi. Nohemi remains as a
+   * reserved fallback for the YAJA logo wordmark. */
+  --font-display: "Pretendard", "Nohemi", system-ui, sans-serif;
+  --font-sans: "Pretendard", "Nohemi", system-ui, sans-serif;
+  --font-kr: "Pretendard", system-ui, sans-serif;
+  --font-num: "Pretendard", system-ui, sans-serif;
 
   /* Radius (DESIGN.md §5.2: 4-8px) */
   --radius-sm: 4px;
@@ -141,9 +143,9 @@ body {
   color: var(--color-yaja-white);
 }
 
-/* Numbers always render with Nohemi tabular-nums */
+/* Numbers (Pretendard tabular-nums for clean digit alignment) */
 .font-num {
-  font-family: var(--font-display);
+  font-family: var(--font-num);
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
 }
