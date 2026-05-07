@@ -1,0 +1,137 @@
+---
+/**
+ * Lenis smooth-scroll + custom cursor follower.
+ * Loaded once globally from Layout.astro. No props.
+ *
+ * Lenis provides the buttery, "Apple-like" momentum scroll that makes
+ * the page feel cinematic. We hook GSAP's ticker to it so any GSAP
+ * scroll-driven animations stay perfectly synced.
+ */
+---
+
+<!-- Custom cursor — hidden on touch devices via CSS -->
+<div id="yaja-cursor" aria-hidden="true">
+  <span class="dot"></span>
+  <span class="ring"></span>
+</div>
+
+<style is:global>
+  /* Hide native cursor only on devices that have a hover-capable mouse */
+  @media (hover: hover) and (pointer: fine) {
+    html,
+    body,
+    a,
+    button,
+    [role="button"] {
+      cursor: none !important;
+    }
+  }
+
+  #yaja-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    mix-blend-mode: difference;
+    transform: translate3d(-100px, -100px, 0);
+    transition: transform 0.05s linear;
+  }
+  #yaja-cursor .dot {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #yaja-cursor .ring {
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+      border-color 0.3s, background-color 0.3s;
+  }
+  #yaja-cursor.is-hover .dot {
+    transform: scale(0);
+  }
+  #yaja-cursor.is-hover .ring {
+    transform: scale(2);
+    background: rgba(255, 72, 72, 0.15);
+    border-color: rgba(255, 72, 72, 0.8);
+  }
+
+  /* Touch devices keep native cursor behaviour */
+  @media (hover: none), (pointer: coarse) {
+    #yaja-cursor {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import Lenis from "lenis";
+
+  // ===== Smooth scroll =====
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t: number) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    smoothWheel: true,
+    touchMultiplier: 1.4,
+  });
+
+  function raf(time: number) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+
+  // Smooth-scroll for anchor links
+  document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
+    a.addEventListener("click", (e) => {
+      const href = a.getAttribute("href");
+      if (!href || href === "#") return;
+      const target = document.querySelector(href);
+      if (target) {
+        e.preventDefault();
+        lenis.scrollTo(target as HTMLElement, { offset: -80, duration: 1.4 });
+      }
+    });
+  });
+
+  // ===== Custom cursor =====
+  const cursor = document.getElementById("yaja-cursor");
+  if (cursor && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let mouseX = 0;
+    let mouseY = 0;
+    let posX = 0;
+    let posY = 0;
+
+    window.addEventListener("mousemove", (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    const tick = () => {
+      // ease toward mouse for slight delay/glide
+      posX += (mouseX - posX) * 0.2;
+      posY += (mouseY - posY) * 0.2;
+      cursor.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+      requestAnimationFrame(tick);
+    };
+    tick();
+
+    // Hover effect on interactive elements
+    const hoverables = "a, button, [role='button'], .group";
+    document.querySelectorAll(hoverables).forEach((el) => {
+      el.addEventListener("mouseenter", () => cursor.classList.add("is-hover"));
+      el.addEventListener("mouseleave", () => cursor.classList.remove("is-hover"));
+    });
+  }
+</script>

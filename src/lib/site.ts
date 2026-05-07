@@ -16,8 +16,8 @@ export const site = {
 
 /** Hero section primary copy. */
 export const hero = {
-  eyebrow: "K-Short Drama Studio",
-  headline: ["대한민국 No.1", "숏폼 드라마 스튜디오"],
+  eyebrow: "K-Short Drama Studio · Est. 2024",
+  headline: ["대한민국", "No.1", "숏폼 드라마", "스튜디오"],
   subhead: "고객님의 성장을 이끄는 최적의 파트너로",
 } as const;
 

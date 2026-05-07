@@ -1,0 +1,94 @@
+---
+/**
+ * Tilted drama-frame grid — YAJA's signature aesthetic from the
+ * 회사소개서 cover. Builds a rotated 4×6 grid of cells with subtle
+ * gradients. Each cell can later receive an actual drama still
+ * via the `images` prop.
+ *
+ * Until real frames arrive, cells render as moody placeholder
+ * gradients with a faint flame watermark — already feels cinematic.
+ */
+
+interface Props {
+  rows?: number;
+  cols?: number;
+  rotate?: number;
+  scale?: number;
+  opacity?: number;
+  images?: string[]; // optional URLs in row-major order
+}
+
+const {
+  rows = 4,
+  cols = 6,
+  rotate = -14,
+  scale = 1.45,
+  opacity = 0.55,
+  images = [],
+} = Astro.props;
+
+const cells = Array.from({ length: rows * cols }, (_, i) => ({
+  i,
+  src: images[i % (images.length || 1)] ?? null,
+}));
+---
+
+<div
+  class="drama-grid pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+  aria-hidden="true"
+>
+  <div
+    class="grid h-full w-full gap-[6px]"
+    style={`grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, 1fr); transform: rotate(${rotate}deg) scale(${scale}); transform-origin: center; opacity: ${opacity};`}
+  >
+    {
+      cells.map((cell) => (
+        <div
+          class="drama-cell relative overflow-hidden bg-gradient-to-br from-yaja-charcoal to-black"
+          data-i={cell.i}
+        >
+          {cell.src ? (
+            <img
+              src={cell.src}
+              alt=""
+              class="absolute inset-0 h-full w-full object-cover anim-ken-burns"
+              loading="lazy"
+            />
+          ) : (
+            <div
+              class="absolute inset-0 bg-cover bg-center opacity-10"
+              style="background-image: url('/logos/fire-symbol/red-symbol.png'); background-size: 35%; background-repeat: no-repeat;"
+            />
+          )}
+          <div class="absolute inset-0 bg-yaja-dark/30" />
+        </div>
+      ))
+    }
+  </div>
+
+  <!-- Vignette over the whole grid -->
+  <div
+    class="absolute inset-0"
+    style="background: radial-gradient(ellipse at center, transparent 30%, rgba(30,30,30,0.7) 70%, rgba(30,30,30,0.95) 100%);"
+  >
+  </div>
+</div>
+
+<style>
+  /* Subtle randomized tinting per nth-child for depth */
+  .drama-cell:nth-child(7n) {
+    background-image: linear-gradient(135deg, #2a1818, #0d0606);
+  }
+  .drama-cell:nth-child(5n) {
+    background-image: linear-gradient(135deg, #1a1f2a, #060a14);
+  }
+  .drama-cell:nth-child(11n) {
+    background-image: linear-gradient(135deg, #2a2418, #181206);
+  }
+  .drama-cell:nth-child(13n) {
+    background-image: linear-gradient(135deg, #281a1f, #100610);
+  }
+  .drama-cell:nth-child(3n) {
+    background-image: linear-gradient(135deg, #14141a, #050508);
+  }
+</style>

@@ -1,0 +1,40 @@
+---
+/**
+ * Infinite horizontal marquee — used for client wall and credit reels.
+ * Renders the children twice and translates -50% so the loop is seamless.
+ */
+interface Props {
+  speed?: number;
+  pauseOnHover?: boolean;
+  reverse?: boolean;
+}
+const { speed = 40, pauseOnHover = true, reverse = false } = Astro.props;
+---
+
+<div
+  class="marquee group relative overflow-hidden"
+  data-pause={pauseOnHover}
+  style={`--marquee-duration: ${speed}s; --marquee-direction: ${reverse ? "reverse" : "normal"};`}
+>
+  <div class="marquee-track flex w-max items-center gap-0 will-change-transform">
+    <div class="flex shrink-0 items-center"><slot /></div>
+    <div class="flex shrink-0 items-center" aria-hidden="true"><slot /></div>
+  </div>
+</div>
+
+<style>
+  .marquee-track {
+    animation: marquee-scroll var(--marquee-duration) linear infinite;
+    animation-direction: var(--marquee-direction);
+  }
+  .marquee[data-pause="true"]:hover .marquee-track {
+    animation-play-state: paused;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(-50%, 0, 0); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+  }
+</style>

@@ -1,87 +1,142 @@
 ---
+import PhoneMockup from "@/components/PhoneMockup.astro";
 import { accounts } from "@/lib/site";
 ---
 
 <section
   id="accounts"
-  class="bg-yaja-dark py-24 md:py-32"
+  class="relative overflow-hidden bg-yaja-dark py-24 md:py-40"
   aria-label="Owned channels"
 >
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div class="reveal">
-      <p
-        class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
-      >
-        02 — Channels
-      </p>
-      <h2 class="mt-4 max-w-[28ch] text-3xl font-extrabold leading-tight md:text-5xl">
-        자체 운영 채널
-      </h2>
-      <p class="mt-5 max-w-[48ch] text-yaja-gray-mid md:text-lg">
-        기획·제작·운영을 모두 자체적으로 수행하는 K-Short Drama 채널입니다.
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <!-- Section header -->
+    <div class="reveal flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p
+          class="font-num flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red"
+        >
+          <span class="block h-px w-8 bg-yaja-red"></span>
+          02 — Channels
+        </p>
+        <h2
+          class="mt-6 max-w-[20ch] font-black leading-[0.95] tracking-[-0.02em]"
+          style="font-size: clamp(36px, 6vw, 96px);"
+        >
+          자체 운영 <span class="text-yaja-red">채널</span>
+        </h2>
+      </div>
+      <p class="max-w-[40ch] text-yaja-gray-mid md:text-right md:text-lg">
+        기획 · 제작 · 운영 전 과정을 자체 수행하는<br class="hidden md:block" />
+        K-Short Drama 채널입니다.
       </p>
     </div>
 
-    <div
-      class="reveal reveal-stagger mt-12 grid gap-6 md:mt-16 md:grid-cols-2 md:gap-10"
-    >
+    <!-- Channel rows — alternating layout, big phone mockup -->
+    <div class="reveal mt-20 space-y-32 md:mt-28">
       {
-        accounts.map((account) => (
-          <a
-            href={account.href}
-            target="_blank"
-            rel="noopener"
-            class="group relative block overflow-hidden rounded-lg border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-8 transition-all hover:border-yaja-red md:p-10"
+        accounts.map((account, i) => (
+          <article
+            class={`grid items-center gap-12 md:gap-20 ${
+              i % 2 === 0 ? "md:grid-cols-[1fr_320px]" : "md:grid-cols-[320px_1fr]"
+            }`}
           >
-            <div class="flex items-baseline justify-between gap-4">
-              <div>
-                <p class="font-num text-[10px] font-semibold uppercase tracking-[0.16em] text-yaja-gray">
-                  {account.subtitle}
-                </p>
-                <h3 class="font-num mt-1 text-3xl font-extrabold tracking-tight md:text-4xl">
-                  {account.title}
-                </h3>
+            {/* Phone mockup */}
+            <div class={i % 2 === 0 ? "md:order-2" : "md:order-1"}>
+              <div class="relative mx-auto w-[260px] md:w-[320px]">
+                <PhoneMockup>
+                  <div class="flex h-full flex-col bg-black p-5 text-white">
+                    <div class="flex items-center justify-between text-[10px] font-num">
+                      <span>{i % 2 === 0 ? "10:55" : "10:59"}</span>
+                      <span class="font-bold">{account.handle}</span>
+                    </div>
+                    <div class="mt-12 flex items-center gap-4">
+                      <div class="flex h-16 w-16 items-center justify-center rounded-full bg-yaja-dark ring-1 ring-white/20">
+                        <img
+                          src="/logos/fire-symbol/red-symbol.png"
+                          alt=""
+                          class="h-8 w-8"
+                        />
+                      </div>
+                      <div class="flex-1">
+                        <p class="font-num text-base font-bold">{account.title}</p>
+                        <p class="text-[11px] text-white/60">{account.subtitle}</p>
+                      </div>
+                    </div>
+                    <div class="mt-6 flex items-baseline gap-4 text-[11px]">
+                      <div>
+                        <p class="font-num text-base font-bold">115</p>
+                        <p class="text-white/50">posts</p>
+                      </div>
+                      <div>
+                        <p class="font-num text-base font-bold">{account.followers}</p>
+                        <p class="text-white/50">followers</p>
+                      </div>
+                    </div>
+                    <div class="mt-4 grid flex-1 grid-cols-3 gap-1">
+                      {Array.from({ length: 9 }).map((_, n) => (
+                        <div
+                          class={`relative aspect-[2/3] overflow-hidden rounded ${
+                            n % 5 === 0 ? "bg-yaja-red/20" : "bg-white/5"
+                          }`}
+                        >
+                          <div class="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </PhoneMockup>
               </div>
-              <p class="font-num text-sm text-yaja-gray-mid">
-                {account.handle}
-              </p>
             </div>
 
-            <dl class="mt-10 grid grid-cols-3 gap-6 border-t border-white/10 pt-8">
-              <div>
-                <dt class="font-num text-[10px] font-semibold uppercase tracking-[0.14em] text-yaja-gray">
-                  누적 조회수
-                </dt>
-                <dd class="font-num mt-2 text-3xl font-black tracking-tight md:text-4xl">
-                  {account.cumulativeViews}
-                  <span class="ml-1 text-sm text-yaja-gray-mid">회</span>
-                </dd>
-              </div>
-              <div>
-                <dt class="font-num text-[10px] font-semibold uppercase tracking-[0.14em] text-yaja-gray">
-                  팔로워
-                </dt>
-                <dd class="font-num mt-2 text-3xl font-black tracking-tight md:text-4xl">
-                  {account.followers}
-                  <span class="ml-1 text-sm text-yaja-gray-mid">명</span>
-                </dd>
-              </div>
-              <div>
-                <dt class="font-num text-[10px] font-semibold uppercase tracking-[0.14em] text-yaja-gray">
-                  평균 조회수
-                </dt>
-                <dd class="font-num mt-2 text-xl font-black tracking-tight md:text-2xl">
-                  {account.avgViews}
-                </dd>
-              </div>
-            </dl>
+            {/* Stats block */}
+            <div class={i % 2 === 0 ? "md:order-1" : "md:order-2"}>
+              <p class="font-num text-[10px] font-semibold uppercase tracking-[0.22em] text-yaja-gray">
+                {account.subtitle}
+              </p>
+              <h3
+                class="font-num mt-2 font-black tracking-[-0.025em]"
+                style="font-size: clamp(48px, 7vw, 112px);"
+              >
+                {account.title}
+              </h3>
+              <a
+                href={account.href}
+                target="_blank"
+                rel="noopener"
+                class="mt-3 inline-block font-num text-base text-yaja-red transition-colors hover:underline"
+              >
+                {account.handle} →
+              </a>
 
-            <span
-              class="font-num pointer-events-none absolute right-8 top-8 text-[10px] font-semibold uppercase tracking-[0.16em] text-yaja-gray opacity-0 transition-opacity group-hover:text-yaja-red group-hover:opacity-100"
-            >
-              View →
-            </span>
-          </a>
+              <dl class="mt-12 grid grid-cols-3 gap-6 border-t border-white/10 pt-10">
+                <div>
+                  <dt class="font-num text-[10px] uppercase tracking-[0.16em] text-yaja-gray">
+                    누적 조회수
+                  </dt>
+                  <dd class="font-num mt-2 text-3xl font-black tracking-tight md:text-5xl">
+                    {account.cumulativeViews}
+                    <span class="ml-1 text-xs text-yaja-gray-mid md:text-base">회</span>
+                  </dd>
+                </div>
+                <div>
+                  <dt class="font-num text-[10px] uppercase tracking-[0.16em] text-yaja-gray">
+                    팔로워
+                  </dt>
+                  <dd class="font-num mt-2 text-3xl font-black tracking-tight md:text-5xl">
+                    {account.followers}
+                  </dd>
+                </div>
+                <div>
+                  <dt class="font-num text-[10px] uppercase tracking-[0.16em] text-yaja-gray">
+                    평균 조회수
+                  </dt>
+                  <dd class="font-num mt-2 text-xl font-black tracking-tight md:text-3xl">
+                    {account.avgViews}
+                  </dd>
+                </div>
+              </dl>
+            </div>
+          </article>
         ))
       }
     </div>

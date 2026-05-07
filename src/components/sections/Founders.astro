@@ -4,41 +4,62 @@ import { founders } from "@/lib/site";
 
 <section
   id="about"
-  class="bg-yaja-dark py-24 md:py-32"
+  class="relative bg-yaja-dark py-24 md:py-40"
   aria-label="Founders"
 >
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div class="reveal">
-      <p
-        class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
-      >
-        About
-      </p>
-      <h2 class="mt-4 max-w-[28ch] text-3xl font-extrabold leading-tight md:text-5xl">
-        창업 멤버
-      </h2>
-      <p class="mt-5 max-w-[52ch] text-yaja-gray-mid md:text-lg">
-        한국 최고의 크리에이터와 프로듀서가 모여 2024년 YAJA Inc.를
-        설립했습니다.
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <div class="reveal flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p
+          class="font-num flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red"
+        >
+          <span class="block h-px w-8 bg-yaja-red"></span>
+          About — Founders
+        </p>
+        <h2
+          class="mt-6 max-w-[20ch] font-black leading-[0.95] tracking-[-0.02em]"
+          style="font-size: clamp(36px, 6vw, 96px);"
+        >
+          창업 <span class="text-yaja-red">멤버</span>
+        </h2>
+      </div>
+      <p class="max-w-[44ch] text-yaja-gray-mid md:text-right md:text-lg">
+        한국 최고의 크리에이터와 프로듀서가 모여<br class="hidden md:block" />
+        2024년 YAJA Inc.를 설립했습니다.
       </p>
     </div>
 
+    <!-- Founder portrait cards — large, cinematic -->
     <div
-      class="reveal reveal-stagger mt-12 grid gap-10 md:mt-16 md:grid-cols-3"
+      class="reveal reveal-stagger mt-16 grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-24 md:grid-cols-3"
     >
       {
-        founders.map((founder) => (
-          <article class="rounded-lg border border-white/10 bg-white/[0.02] p-8 transition-colors hover:border-yaja-red/40">
-            <div class="flex h-14 w-14 items-center justify-center rounded-full bg-yaja-red/10 ring-1 ring-yaja-red/30">
-              <span class="font-num text-lg font-extrabold text-yaja-red">
-                {founder.name.split(" ").map((n) => n[0]).join("")}
-              </span>
+        founders.map((founder, i) => (
+          <article class="group relative bg-yaja-dark p-8 transition-colors hover:bg-yaja-charcoal md:p-12">
+            {/* Portrait placeholder — replace with /portraits/<slug>.jpg */}
+            <div class="relative mx-auto mb-10 h-56 w-56 overflow-hidden rounded-full border-2 border-white/10 bg-gradient-to-br from-yaja-charcoal to-black md:h-64 md:w-64">
+              <div class="absolute inset-0 flex items-center justify-center">
+                <span class="font-num text-7xl font-black text-yaja-red/40 md:text-8xl">
+                  {founder.name
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
+                </span>
+              </div>
+              <div class="absolute inset-0 ring-1 ring-inset ring-white/5" />
             </div>
-            <h3 class="font-num mt-6 text-xl font-extrabold tracking-tight md:text-2xl">
+
+            <p class="font-num text-[10px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+              {String(i + 1).padStart(2, "0")} · {founder.role}
+            </p>
+            <h3
+              class="font-num mt-3 font-black tracking-[-0.02em]"
+              style="font-size: clamp(28px, 2.6vw, 44px);"
+            >
               {founder.name}
             </h3>
-            <p class="font-num text-sm text-yaja-red">{founder.role}</p>
-            <p class="mt-5 text-sm leading-relaxed text-yaja-gray-mid md:text-base">
+
+            <p class="mt-6 text-sm leading-relaxed text-yaja-gray-mid md:text-base">
               {founder.bio}
             </p>
           </article>

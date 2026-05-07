@@ -4,43 +4,65 @@ import { services } from "@/lib/site";
 
 <section
   id="services"
-  class="relative bg-yaja-dark py-24 md:py-32"
+  class="relative overflow-hidden bg-yaja-dark py-24 md:py-40"
   aria-label="Services"
 >
-  <div class="mx-auto max-w-[1440px] px-6 md:px-10">
-    <div class="reveal">
-      <p
-        class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red"
-      >
-        03 — Services
-      </p>
-      <h2 class="mt-4 max-w-[28ch] text-3xl font-extrabold leading-tight md:text-5xl">
-        4가지 솔루션
-      </h2>
-      <p class="mt-5 max-w-[52ch] text-yaja-gray-mid md:text-lg">
-        브랜드의 단계와 목적에 맞춰 서비스를 조합합니다. 단발성 PPL부터
-        오리지널 IP까지, YAJA 한 곳에서 해결합니다.
+  <div class="mx-auto max-w-[1600px] px-6 md:px-10">
+    <div class="reveal flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p
+          class="font-num flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red"
+        >
+          <span class="block h-px w-8 bg-yaja-red"></span>
+          03 — Services
+        </p>
+        <h2
+          class="mt-6 max-w-[28ch] font-black leading-[0.95] tracking-[-0.02em]"
+          style="font-size: clamp(36px, 6vw, 96px);"
+        >
+          4가지 <span class="text-yaja-red">솔루션</span>
+        </h2>
+      </div>
+      <p class="max-w-[42ch] text-yaja-gray-mid md:text-right md:text-lg">
+        브랜드의 단계와 목적에 맞춰 서비스를 조합합니다.<br class="hidden md:block" />
+        단발성 PPL 부터 오리지널 IP 까지 — YAJA 한 곳에서.
       </p>
     </div>
 
+    <!-- Service grid — bordered cells, hover-fills with gradient -->
     <div
-      class="reveal reveal-stagger mt-12 grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-16 md:grid-cols-2"
+      class="reveal reveal-stagger mt-16 grid gap-px overflow-hidden rounded-lg border border-white/10 bg-white/10 md:mt-24 md:grid-cols-2"
     >
       {
         services.map((service, i) => (
-          <article class="bg-yaja-dark p-8 transition-colors hover:bg-yaja-charcoal md:p-12">
-            <p class="font-num text-[11px] font-semibold uppercase tracking-[0.18em] text-yaja-red">
+          <article class="group relative overflow-hidden bg-yaja-dark p-10 transition-colors md:p-16">
+            {/* Hover gradient backdrop */}
+            <div
+              class="pointer-events-none absolute inset-0 -z-0 bg-gradient-to-br from-yaja-red/0 via-yaja-red/0 to-yaja-red/0 transition-all duration-700 group-hover:from-yaja-red/15 group-hover:via-yaja-red/5 group-hover:to-transparent"
+              aria-hidden="true"
+            />
+
+            <p class="relative font-num text-[11px] font-semibold uppercase tracking-[0.22em] text-yaja-red">
               {String(i + 1).padStart(2, "0")}
             </p>
-            <h3 class="font-num mt-3 text-2xl font-extrabold tracking-tight md:text-3xl">
+            <h3
+              class="relative font-num mt-4 font-black tracking-[-0.025em]"
+              style="font-size: clamp(28px, 3.4vw, 56px);"
+            >
               {service.title}
             </h3>
-            <p class="mt-2 text-sm text-yaja-gray md:text-base">
+            <p class="relative mt-2 text-base text-yaja-gray md:text-lg">
               {service.subtitle}
             </p>
-            <p class="mt-6 max-w-[40ch] text-sm text-yaja-gray-mid md:text-base">
+            <p class="relative mt-8 max-w-[44ch] text-sm leading-relaxed text-yaja-gray-mid md:text-base">
               {service.description}
             </p>
+
+            <span
+              class="font-num pointer-events-none absolute right-10 top-10 text-[10px] font-semibold uppercase tracking-[0.18em] text-yaja-red opacity-0 transition-opacity group-hover:opacity-100"
+            >
+              View →
+            </span>
           </article>
         ))
       }
