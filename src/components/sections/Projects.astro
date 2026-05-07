@@ -29,19 +29,14 @@ import { projects } from "@/lib/site";
 
     <div class="reveal reveal-stagger mt-16 space-y-16 md:mt-24 md:space-y-24">
       {
-        projects.map((p, i) => (
-          <article
-            class:list={[
-              "group grid items-center gap-8 md:gap-14",
-              "md:grid-cols-[280px_1fr] lg:grid-cols-[320px_1fr]",
-              i % 2 === 1 ? "md:[&>*:first-child]:order-2" : "",
-            ]}
-          >
-            {/* Vertical video slot (9:16) */}
+        projects.map((p) => (
+          <article class="group grid items-center gap-8 md:grid-cols-[280px_1fr] md:gap-14 lg:grid-cols-[320px_1fr]">
+            {/* Vertical video slot (9:16) — fixed width on md+ for
+                consistent sizing across all cards. */}
             <VerticalVideo
               src={p.video || undefined}
               brand={p.brand}
-              className="mx-auto w-full max-w-[260px] md:max-w-none"
+              className="mx-auto w-full max-w-[260px] md:mx-0 md:max-w-[280px] lg:max-w-[320px]"
             />
 
             {/* Content */}

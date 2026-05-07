@@ -16,22 +16,39 @@ const letters = ["Y", "A", "J", "A"];
   aria-label="Hero"
   data-hero
 >
-  <!-- Background — parallax-enabled, scroll-timeline drives upward
-       drift. Decorations: red orb that breathes + diagonal grain. -->
-  <div class="hero-bg pointer-events-none absolute inset-0 -z-10 scroll-parallax" aria-hidden="true">
-    <!-- Top wash -->
+  <!-- Background — parallax-enabled. GSAP ScrollTrigger drifts this
+       upward as user scrolls past hero. Layers (back→front):
+       1. <video> background loop (if hero.video set)
+       2. Top/bottom gradient washes
+       3. Red orbs that breathe
+       4. Diagonal film-grain texture -->
+  <div
+    class="hero-bg pointer-events-none absolute inset-0 -z-10 overflow-hidden"
+    aria-hidden="true"
+  >
+    {
+      hero.video && (
+        <video
+          src={hero.video}
+          poster={hero.videoPoster || undefined}
+          autoplay
+          muted
+          loop
+          playsinline
+          preload="metadata"
+          class="absolute inset-0 h-[110%] w-full -translate-y-[5%] scale-105 object-cover opacity-40"
+        />
+      )
+    }
+
+    <!-- Color wash over video -->
     <div
-      class="absolute inset-x-0 top-0 h-[50vh]"
-      style="background: linear-gradient(to bottom, rgba(255,72,72,0.07), transparent);"
+      class="absolute inset-0"
+      style="background: linear-gradient(180deg, rgba(30,30,30,0.6) 0%, rgba(30,30,30,0.3) 40%, rgba(30,30,30,0.85) 100%);"
     >
     </div>
-    <!-- Bottom wash -->
-    <div
-      class="absolute inset-x-0 bottom-0 h-[50vh]"
-      style="background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);"
-    >
-    </div>
-    <!-- Soft red orb — drifts continuously (DESIGN.md: subtle motion) -->
+
+    <!-- Soft red orb — drifts continuously -->
     <div
       class="absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] rounded-full bg-yaja-red/14 blur-[120px] anim-orb-drift"
     >

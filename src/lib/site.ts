@@ -20,6 +20,13 @@ export const hero = {
   eyebrow: "K-Short Drama Studio · Est. 2024",
   headline: ["대한민국", "No.1", "숏폼 드라마", "스튜디오"],
   subhead: "고객님의 성장을 이끄는 최적의 파트너로",
+  /**
+   * Background video URL. Drop file at /public/videos/hero.mp4 and set
+   * this to "/videos/hero.mp4" to enable. Empty string disables.
+   */
+  video: "/videos/hero.mp4",
+  /** Optional poster image shown until the video loads. */
+  videoPoster: "",
 } as const;
 
 /** OASIZ-style: 2 prominent stats with descriptions + smaller supporting. */

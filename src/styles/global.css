@@ -217,63 +217,24 @@ body {
   animation: orb-drift 14s ease-in-out infinite;
 }
 
-/* ========== SCROLL-DRIVEN ANIMATIONS (OASIZ-style parallax) ========== */
-/* Modern browsers (Chrome 115+, Safari 17.5+) execute these natively
- * via animation-timeline: scroll(). Older browsers simply skip them
- * and the page degrades to a static, perfectly-readable layout. */
-@supports (animation-timeline: scroll()) {
-  @keyframes hero-bg-parallax {
-    to { transform: translate3d(0, -22vh, 0); }
-  }
-  @keyframes hero-content-fade {
-    0%   { opacity: 1; transform: translateY(0); filter: blur(0); }
-    60%  { opacity: 0.6; transform: translateY(-30px); filter: blur(2px); }
-    100% { opacity: 0; transform: translateY(-80px); filter: blur(8px); }
-  }
-  @keyframes section-rise {
-    from { opacity: 0; transform: translateY(60px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  .scroll-parallax {
-    animation: hero-bg-parallax linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 0 100vh;
-  }
-  .scroll-fade-out {
-    animation: hero-content-fade linear both;
-    animation-timeline: scroll(root block);
-    animation-range: 20vh 90vh;
-  }
-}
-
-/* ========== SCROLL REVEAL (IntersectionObserver fallback for any
- *                        section, slow + elegant) ========== */
+/* ========== SCROLL REVEAL — initial hidden state for GSAP to animate
+ * GSAP ScrollTrigger inside SmoothScroll.astro reads these and runs
+ * the fromTo. CSS provides the initial-state-on-SSR so users see no
+ * flash of unstyled content while JS warms up. */
 .reveal {
   opacity: 0;
-  transform: translateY(48px);
-  transition:
-    opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-    transform 1.2s cubic-bezier(0.16, 1, 0.3, 1),
-    filter 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-  filter: blur(6px);
+  transform: translate3d(0, 48px, 0);
+  filter: blur(8px);
   will-change: opacity, transform, filter;
 }
 
-.reveal.is-visible {
+/* If JavaScript is disabled, show content anyway. */
+.no-js .reveal,
+html:not(.lenis) .reveal {
   opacity: 1;
-  transform: translateY(0);
-  filter: blur(0);
+  transform: none;
+  filter: none;
 }
-
-/* Stagger children when parent has .reveal-stagger */
-.reveal-stagger > * { transition-delay: 0ms; }
-.reveal-stagger.is-visible > *:nth-child(1) { transition-delay: 0ms; }
-.reveal-stagger.is-visible > *:nth-child(2) { transition-delay: 100ms; }
-.reveal-stagger.is-visible > *:nth-child(3) { transition-delay: 200ms; }
-.reveal-stagger.is-visible > *:nth-child(4) { transition-delay: 300ms; }
-.reveal-stagger.is-visible > *:nth-child(5) { transition-delay: 400ms; }
-.reveal-stagger.is-visible > *:nth-child(6) { transition-delay: 500ms; }
 
 /* Reduce motion preference */
 @media (prefers-reduced-motion: reduce) {
