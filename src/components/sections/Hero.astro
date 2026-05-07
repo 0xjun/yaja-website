@@ -1,159 +1,228 @@
 ---
 import { hero, stats } from "@/lib/site";
-import DramaGrid from "@/components/DramaGrid.astro";
+
+/**
+ * Hero — OASIZ-inspired centered architecture, translated to YAJA's
+ * dark + red palette. Each YAJA letter is its own animated layer
+ * (mirroring OASIZ's O-A-S-I-Z stacking) with the FIRE SYMBOL
+ * stamped over the second "A".
+ */
+
+const letters = ["Y", "A", "J", "A"];
 ---
 
 <section
-  class="relative isolate flex min-h-[100svh] flex-col justify-between overflow-hidden bg-yaja-dark"
+  class="hero relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-yaja-dark"
   aria-label="Hero"
 >
-  <!-- Tilted drama frame grid (DESIGN.md cover aesthetic) -->
-  <DramaGrid />
-
-  <!-- Ambient red glow over the grid -->
-  <div class="pointer-events-none absolute inset-0 -z-10">
+  <!-- Background — soft graduated wash, no decoration. OASIZ-clean. -->
+  <div class="pointer-events-none absolute inset-0 -z-10" aria-hidden="true">
+    <!-- Top vignette -->
     <div
-      class="absolute -left-[15%] top-[15%] h-[55vh] w-[55vh] rounded-full bg-yaja-red/20 blur-[140px] anim-fade-in-slow"
+      class="absolute inset-x-0 top-0 h-[40vh]"
+      style="background: linear-gradient(to bottom, rgba(255,72,72,0.06), transparent);"
     >
     </div>
+    <!-- Bottom vignette -->
     <div
-      class="absolute -right-[10%] bottom-[10%] h-[45vh] w-[45vh] rounded-full bg-yaja-red/15 blur-[140px] anim-fade-in-slow"
-      style="animation-delay: 0.4s"
+      class="absolute inset-x-0 bottom-0 h-[40vh]"
+      style="background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);"
+    >
+    </div>
+    <!-- Soft red orb behind logo -->
+    <div
+      class="absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-yaja-red/12 blur-[120px] anim-fade-in-slow"
+    >
+    </div>
+    <!-- Faint diagonal lines for cinematic texture -->
+    <div
+      class="absolute inset-0 opacity-[0.04]"
+      style="background-image: linear-gradient(135deg, transparent 49.5%, white 49.5% 50.5%, transparent 50.5%); background-size: 32px 32px;"
     >
     </div>
   </div>
 
-  <!-- ========== TOP CONTENT ========== -->
+  <!-- ========== STAGE (centered column, OASIZ vertical rhythm) ========== -->
   <div
-    class="relative mx-auto flex w-full max-w-[1440px] flex-col px-6 pt-32 md:px-10 md:pt-40"
+    class="relative mx-auto flex w-full max-w-[1280px] flex-1 flex-col items-center justify-center px-6 py-24 text-center md:px-10 md:py-32"
   >
-    <!-- Eyebrow -->
+    <!-- Eyebrow tag -->
     <p
-      class="anim-fade-in flex items-center gap-3 font-num text-[10px] font-semibold uppercase tracking-[0.22em] text-yaja-red md:text-[11px]"
-      style="animation-delay: 0.1s"
+      class="hero-eyebrow font-num inline-flex items-center gap-3 text-[10px] font-semibold uppercase tracking-[0.32em] text-yaja-red md:text-[11px]"
     >
       <span class="block h-px w-8 bg-yaja-red"></span>
-      {hero.eyebrow}
+      K-Short Drama Studio · Est. 2024
+      <span class="block h-px w-8 bg-yaja-red"></span>
     </p>
 
-    <!-- Headline — 4 lines, character-revealed -->
-    <h1
-      class="hero-title mt-8 font-black leading-[0.92] tracking-[-0.025em]"
-      style="font-size: clamp(48px, 13vw, 200px);"
-    >
-      <span
-        class="reveal-word block"
-        style="animation: hero-line 1s cubic-bezier(0.16,1,0.3,1) 0.3s both;"
-      >
-        {hero.headline[0]}
-      </span>
-      <span
-        class="reveal-word block text-yaja-red"
-        style="animation: hero-line 1s cubic-bezier(0.16,1,0.3,1) 0.45s both;"
-      >
-        {hero.headline[1]}
-      </span>
-      <span
-        class="reveal-word block"
-        style="animation: hero-line 1s cubic-bezier(0.16,1,0.3,1) 0.6s both;"
-      >
-        {hero.headline[2]}
-      </span>
-      <span
-        class="reveal-word block"
-        style="animation: hero-line 1s cubic-bezier(0.16,1,0.3,1) 0.75s both;"
-      >
-        {hero.headline[3]}
-      </span>
-    </h1>
-  </div>
-
-  <!-- ========== BOTTOM CONTENT ========== -->
-  <div
-    class="relative mx-auto flex w-full max-w-[1440px] flex-col gap-12 px-6 pb-20 pt-20 md:flex-row md:items-end md:justify-between md:px-10 md:pb-16"
-  >
-    <!-- Subhead + CTAs -->
-    <div class="max-w-[42ch]">
-      <p
-        class="anim-fade-in text-base text-yaja-gray md:text-xl"
-        style="animation-delay: 1s"
-      >
-        {hero.subhead}
-      </p>
-
-      <div
-        class="anim-fade-in mt-8 flex flex-wrap gap-3"
-        style="animation-delay: 1.2s"
-      >
-        <a
-          href="#works"
-          class="group/cta relative overflow-hidden rounded-md bg-yaja-red px-7 py-4 font-num text-[12px] font-bold tracking-[0.12em] text-yaja-white transition-transform hover:-translate-y-0.5"
-        >
-          <span class="relative z-10">SEE WORKS →</span>
-          <span
-            class="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 group-hover/cta:translate-x-0"
-          ></span>
-        </a>
-        <a
-          href="#contact"
-          class="rounded-md border border-white/20 px-7 py-4 font-num text-[12px] font-bold tracking-[0.12em] text-yaja-white transition-colors hover:border-yaja-red hover:text-yaja-red"
-        >
-          문의하기
-        </a>
-      </div>
-    </div>
-
-    <!-- Mini stats teaser (sneak-peek of #overview) -->
+    <!-- YAJA logo letters — each its own layer, staggered reveal,
+         flame symbol sits to the right as a brand sign-off -->
     <div
-      class="anim-fade-in grid grid-cols-3 gap-6 md:gap-12"
-      style="animation-delay: 1.5s"
+      class="hero-letters relative mt-10 flex items-baseline justify-center md:mt-14"
+      aria-label="YAJA"
     >
       {
-        stats.slice(0, 3).map((s) => (
-          <div>
-            <p class="font-num text-2xl font-black leading-none tracking-tight md:text-4xl">
-              {s.value}
-            </p>
-            <p class="font-num mt-2 text-[9px] uppercase tracking-[0.18em] text-yaja-gray-mid md:text-[10px]">
-              {s.label}
-            </p>
-          </div>
+        letters.map((char, i) => (
+          <span
+            class="hero-letter font-num relative inline-block font-black leading-[0.85] tracking-[-0.05em] text-yaja-white"
+            style={`font-size: clamp(96px, 17vw, 240px); animation-delay: ${0.2 + i * 0.12}s;`}
+          >
+            {char}
+          </span>
         ))
       }
+
+      <!-- Fire flame inline next to YAJA wordmark -->
+      <img
+        src="/logos/fire-symbol/red-symbol.png"
+        alt=""
+        aria-hidden="true"
+        class="hero-flame ml-3 inline-block self-center"
+        style="width: clamp(50px, 9vw, 130px); height: auto; animation-delay: 0.85s;"
+      />
+    </div>
+
+    <!-- Korean headline -->
+    <h1
+      class="hero-headline anim-fade-in mt-12 max-w-[28ch] font-black leading-[1.2] tracking-[-0.01em] md:mt-16"
+      style="font-size: clamp(20px, 2.6vw, 40px); animation-delay: 1.0s;"
+    >
+      대한민국 No.1 <span class="text-yaja-red">숏폼 드라마</span> 스튜디오
+    </h1>
+
+    <!-- Sub copy -->
+    <p
+      class="anim-fade-in mt-6 max-w-[44ch] text-yaja-gray md:text-lg"
+      style="animation-delay: 1.15s;"
+    >
+      고객님의 성장을 이끄는 최적의 파트너로
+    </p>
+
+    <!-- CTAs (centered, like OASIZ) -->
+    <div
+      class="anim-fade-in mt-12 flex flex-wrap items-center justify-center gap-3"
+      style="animation-delay: 1.3s;"
+    >
+      <a
+        href="#works"
+        class="cta-primary group/cta relative overflow-hidden rounded-md bg-yaja-red px-8 py-4 font-num text-[12px] font-bold tracking-[0.18em] text-yaja-white transition-transform hover:-translate-y-0.5"
+      >
+        <span class="relative z-10">MORE</span>
+        <span
+          class="absolute inset-0 -translate-x-full bg-white/20 transition-transform duration-500 group-hover/cta:translate-x-0"
+        ></span>
+      </a>
+      <a
+        href="#contact"
+        class="font-num rounded-md border border-white/25 px-8 py-4 text-[12px] font-bold tracking-[0.18em] text-yaja-white transition-colors hover:border-yaja-red hover:text-yaja-red"
+      >
+        CONTACT
+      </a>
     </div>
   </div>
 
-  <!-- Bottom hairline + scroll cue -->
-  <div class="pointer-events-none absolute inset-x-0 bottom-0">
+  <!-- ========== BOTTOM RAIL (stat preview + scroll cue) ========== -->
+  <div
+    class="anim-fade-in relative mx-auto w-full max-w-[1280px] px-6 pb-10 md:px-10"
+    style="animation-delay: 1.6s;"
+  >
     <div
-      class="anim-fade-in flex justify-center pb-3"
-      style="animation-delay: 1.8s"
+      class="flex flex-col items-center gap-6 border-t border-white/10 pt-6 md:flex-row md:justify-between md:gap-10"
     >
       <span
-        class="font-num flex items-center gap-2 text-[9px] font-semibold uppercase tracking-[0.22em] text-yaja-gray-mid"
+        class="font-num inline-flex items-center gap-3 text-[9px] font-semibold uppercase tracking-[0.28em] text-yaja-gray-mid"
       >
-        Scroll <span class="block h-px w-8 animate-pulse bg-current"></span>
+        <span class="block h-1 w-1 animate-pulse rounded-full bg-yaja-red"></span>
+        Scroll to explore
       </span>
+
+      <div class="flex items-baseline gap-8 md:gap-12">
+        {
+          stats.slice(0, 3).map((s) => (
+            <div class="text-center">
+              <p class="font-num text-2xl font-black leading-none tracking-tight md:text-3xl">
+                {s.value}
+              </p>
+              <p class="font-num mt-2 text-[9px] uppercase tracking-[0.22em] text-yaja-gray-mid">
+                {s.label}
+              </p>
+            </div>
+          ))
+        }
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  @keyframes hero-line {
+  /* ===== Letter entrance ===== */
+  .hero-letter {
+    opacity: 0;
+    transform: translateY(60%) scale(1.05);
+    filter: blur(14px);
+    animation: hero-letter-in 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes hero-letter-in {
     from {
       opacity: 0;
-      transform: translateY(40%);
-      filter: blur(8px);
+      transform: translateY(60%) scale(1.05);
+      filter: blur(14px);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      transform: translateY(0) scale(1);
       filter: blur(0);
     }
   }
 
-  .hero-title .reveal-word {
-    display: block;
-    overflow: hidden;
+  /* ===== Flame inline ===== */
+  .hero-flame {
+    opacity: 0;
+    transform: scale(0.6) rotate(-8deg);
+    animation: hero-flame-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    filter: drop-shadow(0 0 24px rgba(255, 72, 72, 0.5));
+  }
+
+  @keyframes hero-flame-in {
+    from {
+      opacity: 0;
+      transform: scale(0.6) rotate(-8deg);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+    }
+  }
+
+  /* Subtle continuous flicker on the flame after entrance */
+  .hero-flame {
+    animation-fill-mode: both;
+  }
+  .hero-flame::before {
+    content: "";
+  }
+
+  /* Eyebrow drift-in */
+  .hero-eyebrow {
+    opacity: 0;
+    animation: hero-eyebrow-in 1.2s ease 0.05s both;
+  }
+
+  @keyframes hero-eyebrow-in {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-letter,
+    .hero-flame,
+    .hero-eyebrow {
+      animation: none !important;
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+    }
   }
 </style>
