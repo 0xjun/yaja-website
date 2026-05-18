@@ -22,7 +22,9 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* AI-generated YAJA ambient loop — global background video */
+  /* AI-generated YAJA rainbow LED ambient loop — global bg video.
+   * Filter is driven by CSS custom properties so GSAP can scrub
+   * hue + brightness + saturation as the page scrolls. */
   .bg-video {
     position: fixed;
     inset: 0;
@@ -30,7 +32,16 @@
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    will-change: opacity, transform;
+    will-change: opacity, transform, filter;
+    --hue: 0deg;
+    --brightness: 1;
+    --saturation: 1.1;
+    --contrast: 1.05;
+    filter:
+      hue-rotate(var(--hue))
+      brightness(var(--brightness))
+      saturate(var(--saturation))
+      contrast(var(--contrast));
   }
   .bg-video video {
     width: 100%;
@@ -501,9 +512,19 @@ gsap.timeline({
     scrub: true,
   }
 })
-.fromTo('.bg-video', { scale: 1.0,  opacity: 1.0 }, { scale: 1.05, opacity: 0.5, ease: 'none' }, 0)
-.to('.bg-video',     { scale: 1.08, opacity: 0.4, ease: 'none' }, 0.5)
-.to('.bg-video',     { scale: 1.0,  opacity: 0.9, ease: 'power2.out' }, 0.9);  // brand returns at Contact
+// Scene 1 (Brand) → Scene 5 (Contact) bg video orchestration:
+// each scene gets its own lighting mood. Scale, opacity, and the
+// custom-property filter (hue-rotate / brightness / saturation /
+// contrast) all scrub against scroll progress.
+.fromTo('.bg-video',
+  { scale: 1.00, opacity: 1.00, '--hue': '0deg',   '--brightness': 1.00, '--saturation': 1.10, '--contrast': 1.05 },
+  { scale: 1.04, opacity: 0.75, '--hue': '25deg',  '--brightness': 0.85, '--saturation': 1.05, '--contrast': 1.05, ease: 'none' }, 0)   // → Numbers (warm shift)
+.to('.bg-video',
+  { scale: 1.07, opacity: 0.45, '--hue': '-20deg', '--brightness': 0.70, '--saturation': 1.20, '--contrast': 1.10, ease: 'none' }, 0.45) // → Featured (cool deep)
+.to('.bg-video',
+  { scale: 1.05, opacity: 0.55, '--hue': '60deg',  '--brightness': 0.80, '--saturation': 1.15, '--contrast': 1.05, ease: 'none' }, 0.70) // → On Air (green-cool shift)
+.to('.bg-video',
+  { scale: 1.00, opacity: 0.95, '--hue': '0deg',   '--brightness': 1.00, '--saturation': 1.15, '--contrast': 1.05, ease: 'power2.out' }, 0.92); // → Contact (full return)
 
 // ------- Scene transitions driven directly by scroll progress -------
 // Single ScrollTrigger with onUpdate; we compute each scene's opacity
