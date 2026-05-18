@@ -509,17 +509,23 @@ gsap.timeline({
 // of stacking. Each scene has 4 thresholds:
 //   fadeIn → holdStart → holdEnd → fadeOut
 
+// Display order (user-requested):
+//   01 Brand → 02 Numbers → 03 Featured → 04 On Air → 05 Contact
+// HTML ids stay #scene1..#scene5; we just reorder the spec array.
 const sceneSpecs = [
-  // i=0 visible from start, fades out 0.10–0.18
+  // 01 — Brand Reveal (always visible at start)
   { sel: '#scene1', label: '01 / 05 — Brand',
     fadeIn: -Infinity, holdStart: 0.00, holdEnd: 0.10, fadeOut: 0.18 },
-  { sel: '#scene2', label: '02 / 05 — Featured',
+  // 02 — Numbers (was #scene3 in HTML)
+  { sel: '#scene3', label: '02 / 05 — Numbers',
     fadeIn: 0.20, holdStart: 0.25, holdEnd: 0.35, fadeOut: 0.43 },
-  { sel: '#scene3', label: '03 / 05 — Numbers',
+  // 03 — Featured Campaign (was #scene2 in HTML)
+  { sel: '#scene2', label: '03 / 05 — Featured',
     fadeIn: 0.45, holdStart: 0.50, holdEnd: 0.60, fadeOut: 0.68 },
+  // 04 — On Air
   { sel: '#scene4', label: '04 / 05 — On Air',
     fadeIn: 0.70, holdStart: 0.75, holdEnd: 0.85, fadeOut: 0.93 },
-  // last scene stays visible until end of scroll
+  // 05 — Contact (stays visible to the end of the scroll)
   { sel: '#scene5', label: '05 / 05 — Contact',
     fadeIn: 0.93, holdStart: 0.98, holdEnd: Infinity, fadeOut: Infinity },
 ];
@@ -564,16 +570,19 @@ ScrollTrigger.create({
   },
 });
 
-// ------- Number count-up for Scene 3 (triggered when scene becomes visible) -------
+// ------- Number count-up — fires when Numbers scene becomes visible -------
+// Numbers content lives in #scene3 (HTML), now displayed at scroll 0.20–0.43.
 const nums = document.querySelectorAll('.scene-3 .num');
-let s3Triggered = false;
+const NUM_FIRE = 0.22;   // a touch after fadeIn at 0.20
+const NUM_RESET = 0.18;  // reset before next time
+let numsTriggered = false;
 ScrollTrigger.create({
   trigger: '.story',
   start: 'top top',
   end: 'bottom bottom',
   onUpdate: self => {
-    if (self.progress >= 0.43 && !s3Triggered) {
-      s3Triggered = true;
+    if (self.progress >= NUM_FIRE && !numsTriggered) {
+      numsTriggered = true;
       nums.forEach(el => {
         const target = parseInt(el.dataset.target, 10);
         const obj = { v: 0 };
@@ -585,8 +594,8 @@ ScrollTrigger.create({
         });
       });
     }
-    if (self.progress < 0.4) {
-      s3Triggered = false;
+    if (self.progress < NUM_RESET) {
+      numsTriggered = false;
       nums.forEach(el => el.textContent = '0');
     }
   }
