@@ -43,6 +43,82 @@
       saturate(var(--saturation))
       contrast(var(--contrast));
   }
+
+  /* ----- Reflective light sweeps -----
+   * Three independent moving "spotlights" pan across the screen
+   * at different speeds and blend modes. Combined with the
+   * underlying rainbow LED logo, they create the illusion that
+   * the logo is a static reflective surface catching external
+   * moving lights — exactly what an iridescent chrome / hologram
+   * material does in real life. */
+  .light-sweep {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background-repeat: no-repeat;
+    will-change: background-position, opacity;
+  }
+  /* Primary highlight — large warm-white specular */
+  .light-sweep--primary {
+    background-image: radial-gradient(
+      ellipse 55vw 75vh at center,
+      rgba(255, 240, 220, 0.42) 0%,
+      rgba(255, 200, 180, 0.20) 20%,
+      transparent 55%
+    );
+    background-size: 200% 200%;
+    background-position: 20% 30%;
+    mix-blend-mode: screen;
+    animation: light-pan-a 18s ease-in-out infinite alternate;
+  }
+  /* Secondary highlight — cool-tinted, faster, opposite direction */
+  .light-sweep--secondary {
+    background-image: radial-gradient(
+      ellipse 45vw 55vh at center,
+      rgba(180, 220, 255, 0.30) 0%,
+      rgba(200, 180, 255, 0.16) 25%,
+      transparent 60%
+    );
+    background-size: 220% 220%;
+    background-position: 80% 60%;
+    mix-blend-mode: screen;
+    animation: light-pan-b 13s ease-in-out infinite alternate;
+  }
+  /* Tertiary highlight — magenta-pink, slow, soft-light blend
+   * (chromatic dispersion feel) */
+  .light-sweep--tertiary {
+    background-image: radial-gradient(
+      ellipse 70vw 40vh at center,
+      rgba(255, 120, 200, 0.28) 0%,
+      transparent 50%
+    );
+    background-size: 240% 240%;
+    background-position: 50% 80%;
+    mix-blend-mode: soft-light;
+    animation: light-pan-c 26s ease-in-out infinite alternate-reverse;
+  }
+
+  @keyframes light-pan-a {
+    0%   { background-position: 10% 25%; }
+    33%  { background-position: 70% 55%; }
+    66%  { background-position: 30% 75%; }
+    100% { background-position: 85% 35%; }
+  }
+  @keyframes light-pan-b {
+    0%   { background-position: 80% 60%; }
+    50%  { background-position: 25% 30%; }
+    100% { background-position: 60% 85%; }
+  }
+  @keyframes light-pan-c {
+    0%   { background-position: 50% 80%; }
+    50%  { background-position: 20% 20%; }
+    100% { background-position: 80% 70%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .light-sweep { animation: none; }
+  }
   .bg-video video {
     width: 100%;
     height: 100%;
@@ -385,6 +461,12 @@
     <source src="/videos/yaja-bg-loop.mp4" type="video/mp4">
   </video>
 </div>
+
+<!-- Reflective light-sweep overlays — create the illusion of
+     external moving spotlights on a static reflective surface -->
+<div class="light-sweep light-sweep--primary" aria-hidden="true"></div>
+<div class="light-sweep light-sweep--secondary" aria-hidden="true"></div>
+<div class="light-sweep light-sweep--tertiary" aria-hidden="true"></div>
 
 <!-- Legacy poster wall (hidden, kept for reference) -->
 <div class="bg-fixed" id="bgFixed"></div>
