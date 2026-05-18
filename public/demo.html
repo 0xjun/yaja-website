@@ -22,102 +22,96 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* AI-generated YAJA rainbow LED ambient loop — global bg video.
-   * Filter is driven by CSS custom properties so GSAP can scrub
-   * hue + brightness + saturation as the page scrolls. */
-  .bg-video {
+  /* ----- Static chrome YAJA logo backdrop -----
+   * The logo is rendered as a high-resolution mirror-ball image
+   * (assets/yaja-chrome.png). It does NOT animate — only the
+   * rainbow light sweeps above it move. */
+  .bg-stage {
     position: fixed;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
     z-index: 0;
-    will-change: opacity, transform, filter;
-    --hue: 0deg;
-    --brightness: 1;
-    --saturation: 1.1;
-    --contrast: 1.05;
-    filter:
-      hue-rotate(var(--hue))
-      brightness(var(--brightness))
-      saturate(var(--saturation))
-      contrast(var(--contrast));
+    background: #000;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+  .bg-logo-static {
+    width: 75%;
+    max-width: 1500px;
+    height: auto;
+    user-select: none;
+    pointer-events: none;
+    filter: brightness(0.85) contrast(1.1);
+    will-change: filter;
   }
 
-  /* ----- Reflective light sweeps -----
-   * Three independent moving "spotlights" pan across the screen
-   * at different speeds and blend modes. Combined with the
-   * underlying rainbow LED logo, they create the illusion that
-   * the logo is a static reflective surface catching external
-   * moving lights — exactly what an iridescent chrome / hologram
-   * material does in real life. */
-  .light-sweep {
+  /* ----- Scroll-linked rainbow spotlights -----
+   * Six radial-gradient layers, 3 from TOP and 3 from BOTTOM,
+   * with YAJA Red as the dominant color. Their horizontal
+   * positions are scrubbed by scroll progress (no time-based
+   * animation), so the lights only move while the user scrolls.
+   * A subtle continuous Y-bob keeps them feeling alive when
+   * the user is idle. */
+  .light {
     position: fixed;
     inset: 0;
     z-index: 1;
     pointer-events: none;
+    mix-blend-mode: screen;
     background-repeat: no-repeat;
-    will-change: background-position, opacity;
-  }
-  /* Primary highlight — large warm-white specular */
-  .light-sweep--primary {
-    background-image: radial-gradient(
-      ellipse 55vw 75vh at center,
-      rgba(255, 240, 220, 0.42) 0%,
-      rgba(255, 200, 180, 0.20) 20%,
-      transparent 55%
-    );
-    background-size: 200% 200%;
-    background-position: 20% 30%;
-    mix-blend-mode: screen;
-    animation: light-pan-a 18s ease-in-out infinite alternate;
-  }
-  /* Secondary highlight — cool-tinted, faster, opposite direction */
-  .light-sweep--secondary {
-    background-image: radial-gradient(
-      ellipse 45vw 55vh at center,
-      rgba(180, 220, 255, 0.30) 0%,
-      rgba(200, 180, 255, 0.16) 25%,
-      transparent 60%
-    );
-    background-size: 220% 220%;
-    background-position: 80% 60%;
-    mix-blend-mode: screen;
-    animation: light-pan-b 13s ease-in-out infinite alternate;
-  }
-  /* Tertiary highlight — magenta-pink, slow, soft-light blend
-   * (chromatic dispersion feel) */
-  .light-sweep--tertiary {
-    background-image: radial-gradient(
-      ellipse 70vw 40vh at center,
-      rgba(255, 120, 200, 0.28) 0%,
-      transparent 50%
-    );
-    background-size: 240% 240%;
-    background-position: 50% 80%;
-    mix-blend-mode: soft-light;
-    animation: light-pan-c 26s ease-in-out infinite alternate-reverse;
+    will-change: transform, opacity;
   }
 
-  @keyframes light-pan-a {
-    0%   { background-position: 10% 25%; }
-    33%  { background-position: 70% 55%; }
-    66%  { background-position: 30% 75%; }
-    100% { background-position: 85% 35%; }
+  /* TOP lights (3 layers) — emerge from top edge */
+  .light-top-red {
+    background-image: radial-gradient(
+      ellipse 75vw 60vh at center top,
+      rgba(255, 72, 72, 0.65) 0%,
+      rgba(255, 40, 100, 0.32) 25%,
+      transparent 55%
+    );
   }
-  @keyframes light-pan-b {
-    0%   { background-position: 80% 60%; }
-    50%  { background-position: 25% 30%; }
-    100% { background-position: 60% 85%; }
+  .light-top-orange {
+    background-image: radial-gradient(
+      ellipse 55vw 50vh at center top,
+      rgba(255, 130, 50, 0.42) 0%,
+      rgba(255, 200, 80, 0.20) 30%,
+      transparent 55%
+    );
   }
-  @keyframes light-pan-c {
-    0%   { background-position: 50% 80%; }
-    50%  { background-position: 20% 20%; }
-    100% { background-position: 80% 70%; }
+  .light-top-magenta {
+    background-image: radial-gradient(
+      ellipse 50vw 45vh at center top,
+      rgba(255, 80, 200, 0.38) 0%,
+      transparent 55%
+    );
+  }
+
+  /* BOTTOM lights (3 layers) — emerge from bottom edge */
+  .light-bottom-yellow {
+    background-image: radial-gradient(
+      ellipse 60vw 50vh at center bottom,
+      rgba(255, 220, 100, 0.38) 0%,
+      transparent 55%
+    );
+  }
+  .light-bottom-cyan {
+    background-image: radial-gradient(
+      ellipse 55vw 50vh at center bottom,
+      rgba(100, 220, 255, 0.40) 0%,
+      transparent 55%
+    );
+  }
+  .light-bottom-violet {
+    background-image: radial-gradient(
+      ellipse 50vw 50vh at center bottom,
+      rgba(180, 100, 255, 0.38) 0%,
+      transparent 55%
+    );
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .light-sweep { animation: none; }
+    .light { transform: none !important; }
   }
   .bg-video video {
     width: 100%;
@@ -455,18 +449,23 @@
   <span class="red">01</span> / 05 — Brand
 </div>
 
-<!-- Global YAJA logo ambient loop video (AI-generated via Seedance 2.0) -->
-<div class="bg-video">
-  <video autoplay muted loop playsinline preload="auto">
-    <source src="/videos/yaja-bg-loop.mp4" type="video/mp4">
-  </video>
+<!-- Static chrome YAJA logo backdrop (mirror-ball aesthetic) -->
+<div class="bg-stage">
+  <img
+    class="bg-logo-static"
+    src="/logos/yaja-chrome.png"
+    alt=""
+    aria-hidden="true"
+  />
 </div>
 
-<!-- Reflective light-sweep overlays — create the illusion of
-     external moving spotlights on a static reflective surface -->
-<div class="light-sweep light-sweep--primary" aria-hidden="true"></div>
-<div class="light-sweep light-sweep--secondary" aria-hidden="true"></div>
-<div class="light-sweep light-sweep--tertiary" aria-hidden="true"></div>
+<!-- Six rainbow spotlights, 3 top + 3 bottom, scroll-driven -->
+<div class="light light-top-red"      aria-hidden="true"></div>
+<div class="light light-top-orange"   aria-hidden="true"></div>
+<div class="light light-top-magenta"  aria-hidden="true"></div>
+<div class="light light-bottom-yellow" aria-hidden="true"></div>
+<div class="light light-bottom-cyan"   aria-hidden="true"></div>
+<div class="light light-bottom-violet" aria-hidden="true"></div>
 
 <!-- Legacy poster wall (hidden, kept for reference) -->
 <div class="bg-fixed" id="bgFixed"></div>
@@ -594,19 +593,47 @@ gsap.timeline({
     scrub: true,
   }
 })
-// Scene 1 (Brand) → Scene 5 (Contact) bg video orchestration:
-// each scene gets its own lighting mood. Scale, opacity, and the
-// custom-property filter (hue-rotate / brightness / saturation /
-// contrast) all scrub against scroll progress.
-.fromTo('.bg-video',
-  { scale: 1.00, opacity: 1.00, '--hue': '0deg',   '--brightness': 1.00, '--saturation': 1.10, '--contrast': 1.05 },
-  { scale: 1.04, opacity: 0.75, '--hue': '25deg',  '--brightness': 0.85, '--saturation': 1.05, '--contrast': 1.05, ease: 'none' }, 0)   // → Numbers (warm shift)
-.to('.bg-video',
-  { scale: 1.07, opacity: 0.45, '--hue': '-20deg', '--brightness': 0.70, '--saturation': 1.20, '--contrast': 1.10, ease: 'none' }, 0.45) // → Featured (cool deep)
-.to('.bg-video',
-  { scale: 1.05, opacity: 0.55, '--hue': '60deg',  '--brightness': 0.80, '--saturation': 1.15, '--contrast': 1.05, ease: 'none' }, 0.70) // → On Air (green-cool shift)
-.to('.bg-video',
-  { scale: 1.00, opacity: 0.95, '--hue': '0deg',   '--brightness': 1.00, '--saturation': 1.15, '--contrast': 1.05, ease: 'power2.out' }, 0.92); // → Contact (full return)
+// ----- Scroll-linked rainbow light motion -----
+// Each spotlight slides horizontally across the screen as the user
+// scrolls. Top lights and bottom lights move in opposite directions
+// at different speeds, so the combined effect feels like a stage
+// with multiple moving lights illuminating the static chrome logo.
+//
+// scrub: true means the lights ONLY move when the user scrolls.
+
+const lightTimeline = gsap.timeline({
+  scrollTrigger: {
+    trigger: '.story',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: true,
+  }
+});
+
+// TOP lights — different starting positions, different sweep ranges
+lightTimeline
+  .fromTo('.light-top-red',     { x: '-25vw', opacity: 0.95 }, { x: '25vw',  opacity: 1.00, ease: 'none' }, 0)
+  .fromTo('.light-top-orange',  { x: '20vw',  opacity: 0.70 }, { x: '-35vw', opacity: 0.85, ease: 'none' }, 0)
+  .fromTo('.light-top-magenta', { x: '-10vw', opacity: 0.60 }, { x: '40vw',  opacity: 0.75, ease: 'none' }, 0)
+  // BOTTOM lights — opposite directions, slightly different timing
+  .fromTo('.light-bottom-yellow', { x: '30vw',  opacity: 0.70 }, { x: '-25vw', opacity: 0.85, ease: 'none' }, 0)
+  .fromTo('.light-bottom-cyan',   { x: '-35vw', opacity: 0.65 }, { x: '30vw',  opacity: 0.80, ease: 'none' }, 0)
+  .fromTo('.light-bottom-violet', { x: '15vw',  opacity: 0.55 }, { x: '-30vw', opacity: 0.70, ease: 'none' }, 0);
+
+// Continuous subtle Y-bob keeps the lights "alive" when the user
+// is idle (not scrolling). Very slow, very small amplitude.
+gsap.to(['.light-top-red', '.light-top-orange', '.light-top-magenta'], {
+  y: '4vh', duration: 9, repeat: -1, yoyo: true, ease: 'sine.inOut',
+});
+gsap.to(['.light-bottom-yellow', '.light-bottom-cyan', '.light-bottom-violet'], {
+  y: '-4vh', duration: 11, repeat: -1, yoyo: true, ease: 'sine.inOut',
+});
+
+// Chrome logo brightness gently pulses when user idle (very subtle)
+gsap.to('.bg-logo-static', {
+  filter: 'brightness(0.95) contrast(1.15)',
+  duration: 6, repeat: -1, yoyo: true, ease: 'sine.inOut',
+});
 
 // ------- Scene transitions driven directly by scroll progress -------
 // Single ScrollTrigger with onUpdate; we compute each scene's opacity
