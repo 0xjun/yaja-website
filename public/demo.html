@@ -503,39 +503,65 @@ gsap.timeline({
 .to('.bg-fixed', { scale: 1.05, rotate: 0.8, ease: 'none' }, 0.4)
 .to('.bg-fixed', { scale: 0.85, rotate: 0, ease: 'power2.out' }, 0.8);   // scene 5 zoom-out
 
-// ------- Scene cross-fades driven by scroll progress -------
-// Each scene gets:
-//   - fade-in scale-down  during a 0.07 window
-//   - hold              for 0.06 window
-//   - fade-out scale-down during a 0.07 window
+// ------- Scene transitions driven directly by scroll progress -------
+// Single ScrollTrigger with onUpdate; we compute each scene's opacity
+// and scale per-frame so scenes properly REPLACE each other instead
+// of stacking. Each scene has 4 thresholds:
+//   fadeIn → holdStart → holdEnd → fadeOut
 
-const scenes = [
-  { sel: '#scene1', label: '01 / 05 — Brand', enterStart: 0.00, enterEnd: 0.06, exitStart: 0.15, exitEnd: 0.21 },
-  { sel: '#scene2', label: '02 / 05 — Featured', enterStart: 0.20, enterEnd: 0.26, exitStart: 0.36, exitEnd: 0.42 },
-  { sel: '#scene3', label: '03 / 05 — Numbers',  enterStart: 0.41, enterEnd: 0.47, exitStart: 0.57, exitEnd: 0.63 },
-  { sel: '#scene4', label: '04 / 05 — On Air',   enterStart: 0.62, enterEnd: 0.68, exitStart: 0.78, exitEnd: 0.84 },
-  { sel: '#scene5', label: '05 / 05 — Contact',  enterStart: 0.83, enterEnd: 0.89, exitStart: 1.10, exitEnd: 1.20 },
+const sceneSpecs = [
+  // i=0 visible from start, fades out 0.10–0.18
+  { sel: '#scene1', label: '01 / 05 — Brand',
+    fadeIn: -Infinity, holdStart: 0.00, holdEnd: 0.10, fadeOut: 0.18 },
+  { sel: '#scene2', label: '02 / 05 — Featured',
+    fadeIn: 0.20, holdStart: 0.25, holdEnd: 0.35, fadeOut: 0.43 },
+  { sel: '#scene3', label: '03 / 05 — Numbers',
+    fadeIn: 0.45, holdStart: 0.50, holdEnd: 0.60, fadeOut: 0.68 },
+  { sel: '#scene4', label: '04 / 05 — On Air',
+    fadeIn: 0.70, holdStart: 0.75, holdEnd: 0.85, fadeOut: 0.93 },
+  // last scene stays visible until end of scroll
+  { sel: '#scene5', label: '05 / 05 — Contact',
+    fadeIn: 0.93, holdStart: 0.98, holdEnd: Infinity, fadeOut: Infinity },
 ];
 
-scenes.forEach((s, i) => {
-  const el = document.querySelector(s.sel);
+// Cache nodes once
+sceneSpecs.forEach(s => { s.el = document.querySelector(s.sel); });
 
-  if (i === 0) {
-    // Scene 1: visible at start, only animates the exit
-    gsap.set(el, { opacity: 1, scale: 1 });
-    gsap.timeline({
-      scrollTrigger: { trigger: '.story', start: 'top top', end: 'bottom bottom', scrub: true }
-    })
-    .to(el, { opacity: 0, scale: 0.85, ease: 'power2.in' }, s.exitStart);
-  } else {
-    // Other scenes: hidden, zoom in from 1.25 then fade out shrinking
-    gsap.set(el, { opacity: 0, scale: 1.25 });
-    gsap.timeline({
-      scrollTrigger: { trigger: '.story', start: 'top top', end: 'bottom bottom', scrub: true }
-    })
-    .to(el, { opacity: 1, scale: 1, ease: 'power2.out' }, s.enterStart)
-    .to(el, { opacity: 0, scale: 0.85, ease: 'power2.in' }, s.exitStart);
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp01(x) { return Math.max(0, Math.min(1, x)); }
+
+function computeSceneState(p, s) {
+  if (p < s.fadeIn) return { opacity: 0, scale: 1.25 };
+  if (p < s.holdStart) {
+    const t = clamp01((p - s.fadeIn) / (s.holdStart - s.fadeIn));
+    return { opacity: t, scale: lerp(1.25, 1, t) };
   }
+  if (p <= s.holdEnd) return { opacity: 1, scale: 1 };
+  if (p <= s.fadeOut) {
+    const t = clamp01((p - s.holdEnd) / (s.fadeOut - s.holdEnd));
+    return { opacity: 1 - t, scale: lerp(1, 0.85, t) };
+  }
+  return { opacity: 0, scale: 0.85 };
+}
+
+// Initial paint
+sceneSpecs.forEach((s, i) => {
+  gsap.set(s.el, i === 0 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.25 });
+});
+
+ScrollTrigger.create({
+  trigger: '.story',
+  start: 'top top',
+  end: 'bottom bottom',
+  scrub: true,
+  onUpdate: (self) => {
+    const p = self.progress;
+    sceneSpecs.forEach(s => {
+      const { opacity, scale } = computeSceneState(p, s);
+      s.el.style.opacity = opacity;
+      s.el.style.transform = `scale(${scale})`;
+    });
+  },
 });
 
 // ------- Number count-up for Scene 3 (triggered when scene becomes visible) -------
@@ -575,10 +601,10 @@ ScrollTrigger.create({
   end: 'bottom bottom',
   onUpdate: self => {
     progress.style.width = `${(self.progress * 100).toFixed(1)}%`;
-    // Find active scene
-    let active = scenes[0];
-    for (const s of scenes) {
-      if (self.progress >= s.enterStart) active = s;
+    // Find active scene = the latest scene whose holdStart has been reached
+    let active = sceneSpecs[0];
+    for (const s of sceneSpecs) {
+      if (self.progress >= s.holdStart) active = s;
     }
     counter.innerHTML = `<span class="red">${active.label.split(' ')[0]}</span> / ${active.label.split('/')[1]}`;
   }
