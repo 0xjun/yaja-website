@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>YAJA — Scene-Pin Demo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+  /* =========================================================
+     Banas-style scene-pinning scroll demo for YAJA.
+     One single sticky stage. Five overlapping scenes that
+     fade / scale in & out as the scroll progress advances.
+     The poster grid stays fixed throughout but is animated
+     with a subtle zoom-pan to suggest depth.
+     ========================================================= */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #1E1E1E; color: #fff; }
+  body {
+    font-family: 'Pretendard', system-ui, sans-serif;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Fixed poster wall — always visible, lightly animated */
+  .bg-fixed {
+    position: fixed;
+    inset: -5%;
+    z-index: 0;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 8px;
+    transform-origin: center center;
+    will-change: transform;
+  }
+  .bg-cell {
+    position: relative;
+    background-color: #0c0c0c;
+    background-size: cover;
+    background-position: center;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .bg-cell::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(20,20,20,.55), rgba(0,0,0,.85));
+  }
+
+  /* Soft red orb for ambient depth */
+  .ambient {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .ambient::before {
+    content: '';
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 80vmin; height: 80vmin;
+    background: radial-gradient(circle, rgba(255,72,72,.18), transparent 60%);
+    transform: translate(-50%, -50%);
+    filter: blur(40px);
+  }
+
+  /* Tall scrollable container; the sticky stage is the visual layer */
+  .story {
+    position: relative;
+    height: 500vh;            /* 5 scenes × 100vh of scroll */
+    z-index: 2;
+  }
+  .stage {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .scene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 32px;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  /* ----- Scene 1 ----- */
+  .s1-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #FF4848;
+    margin-bottom: 32px;
+  }
+  .s1-title {
+    font-size: clamp(96px, 18vw, 280px);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.15em;
+  }
+  .s1-flame {
+    width: 0.65em;
+    height: 0.85em;
+    object-fit: contain;
+    filter: drop-shadow(0 0 30px rgba(255,72,72,.6));
+  }
+  .s1-sub {
+    margin-top: 44px;
+    font-size: clamp(20px, 2.4vw, 38px);
+    font-weight: 700;
+    color: #C8CDD7;
+    letter-spacing: -0.015em;
+  }
+  .s1-sub .red { color: #FF4848; }
+
+  /* ----- Scene 2 ----- */
+  .s2-card {
+    width: clamp(280px, 26vw, 420px);
+    aspect-ratio: 9/16;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,.6);
+  }
+  .s2-card video {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .s2-meta { margin-top: 40px; }
+  .s2-eyebrow {
+    color: #FF4848;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .s2-brand {
+    font-size: clamp(48px, 7vw, 120px);
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    margin-bottom: 12px;
+  }
+  .s2-num {
+    font-size: clamp(24px, 3vw, 44px);
+    color: #C8CDD7;
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+  }
+
+  /* ----- Scene 3 ----- */
+  .s3-grid {
+    display: flex;
+    gap: clamp(60px, 9vw, 140px);
+    align-items: baseline;
+  }
+  .s3-stat { text-align: center; }
+  .s3-val {
+    font-size: clamp(80px, 13vw, 200px);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+  .s3-val .u {
+    color: #FF4848;
+    font-size: 0.45em;
+    margin-left: 0.1em;
+  }
+  .s3-label {
+    margin-top: 18px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #9CA3AF;
+  }
+  .s3-tag {
+    margin-top: 60px;
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #FF4848;
+    font-weight: 700;
+  }
+
+  /* ----- Scene 4 ----- */
+  .s4-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: #FF4848;
+    margin-bottom: 48px;
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .s4-eyebrow::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #FF4848;
+    animation: pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse { 50% { opacity: .35; } }
+  .s4-cards {
+    display: flex;
+    gap: 28px;
+  }
+  .s4-card {
+    width: clamp(180px, 19vw, 280px);
+    aspect-ratio: 9/14;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #0c0c0c;
+    position: relative;
+    border: 1px solid rgba(255,255,255,.08);
+  }
+  .s4-card img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  .s4-card .badge {
+    position: absolute;
+    top: 14px; left: 14px;
+    padding: 5px 10px;
+    background: #FF4848;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border-radius: 3px;
+  }
+  .s4-card .name {
+    position: absolute;
+    bottom: 18px; left: 18px; right: 18px;
+    font-size: clamp(16px, 1.4vw, 22px);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .s4-card .name .ko {
+    display: block;
+    font-size: 0.6em;
+    font-weight: 600;
+    color: #C8CDD7;
+    margin-top: 4px;
+    letter-spacing: 0;
+  }
+  .s4-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.7), transparent 50%);
+  }
+
+  /* ----- Scene 5 ----- */
+  .s5-title {
+    font-size: clamp(56px, 9vw, 160px);
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+    max-width: 14ch;
+  }
+  .s5-title .red { color: #FF4848; }
+  .s5-sub {
+    margin-top: 36px;
+    font-size: clamp(16px, 1.5vw, 22px);
+    color: #C8CDD7;
+    font-weight: 500;
+  }
+  .s5-actions {
+    margin-top: 56px;
+    display: flex;
+    gap: 14px;
+  }
+  .s5-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 40px;
+    background: #FF4848;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: transform .2s;
+  }
+  .s5-cta:hover { transform: translateY(-2px); }
+  .s5-cta.ghost {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,.3);
+  }
+
+  /* Scene counter (debug aid) */
+  .scene-counter {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 50;
+    padding: 8px 16px;
+    background: rgba(0,0,0,.5);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #C8CDD7;
+    backdrop-filter: blur(8px);
+  }
+  .scene-counter .red { color: #FF4848; }
+
+  /* Brand fixed in top-left */
+  .brand-fixed {
+    position: fixed;
+    top: 24px;
+    left: 24px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .brand-fixed img { height: 24px; }
+  .brand-fixed .mark {
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    font-size: 16px;
+  }
+
+  /* Progress bar */
+  .progress {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 2px;
+    width: 0;
+    background: #FF4848;
+    z-index: 60;
+    transition: width 0.1s linear;
+  }
+</style>
+</head>
+<body>
+
+<!-- Fixed brand top-left -->
+<div class="brand-fixed">
+  <img src="/logos/fire-symbol/red-symbol.png" alt="">
+  <span class="mark">YAJA</span>
+</div>
+
+<!-- Fixed scene counter top-right -->
+<div class="scene-counter" id="counter">
+  <span class="red">01</span> / 05 — Brand
+</div>
+
+<!-- Fixed poster wall — animated via GSAP -->
+<div class="bg-fixed" id="bgFixed"></div>
+
+<!-- Ambient red orb layer -->
+<div class="ambient"></div>
+
+<!-- The story container — 500vh tall, contains a sticky stage -->
+<div class="story" id="story">
+  <div class="stage" id="stage">
+
+    <!-- Scene 1: Brand Reveal -->
+    <section class="scene scene-1" id="scene1">
+      <p class="s1-eyebrow">— K-Short Drama Studio · Est. 2024</p>
+      <h1 class="s1-title">
+        <span>YAJA</span>
+        <img src="/logos/fire-symbol/red-symbol.png" class="s1-flame" alt="">
+      </h1>
+      <p class="s1-sub">
+        대한민국 <span class="red">No.1</span> 숏폼 드라마 스튜디오.
+      </p>
+    </section>
+
+    <!-- Scene 2: Featured Campaign -->
+    <section class="scene scene-2" id="scene2">
+      <div class="s2-card">
+        <video src="/videos/projects/vaseline.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <div class="s2-meta">
+        <p class="s2-eyebrow">— Featured Campaign</p>
+        <p class="s2-brand">VASELINE</p>
+        <p class="s2-num">12,342,129 회 · Branded Contents</p>
+      </div>
+    </section>
+
+    <!-- Scene 3: Big Numbers -->
+    <section class="scene scene-3" id="scene3">
+      <div class="s3-grid">
+        <div class="s3-stat">
+          <div class="s3-val"><span class="num" data-target="19">0</span><span class="u">억</span></div>
+          <div class="s3-label">Total Views</div>
+        </div>
+        <div class="s3-stat">
+          <div class="s3-val"><span class="num" data-target="682">0</span><span class="u">만</span></div>
+          <div class="s3-label">Avg / Episode</div>
+        </div>
+        <div class="s3-stat">
+          <div class="s3-val"><span class="num" data-target="183">0</span><span class="u">만</span></div>
+          <div class="s3-label">Followers</div>
+        </div>
+      </div>
+      <p class="s3-tag">★ TikTok Awards 2024 — Video of The Year</p>
+    </section>
+
+    <!-- Scene 4: ON AIR Lineup -->
+    <section class="scene scene-4" id="scene4">
+      <p class="s4-eyebrow">On Air · 2026 Week 18</p>
+      <div class="s4-cards">
+        <div class="s4-card">
+          <img src="/screens/yajacamp-ig.png" alt="">
+          <span class="badge">On Air</span>
+          <div class="name">YAJA POP<span class="ko">야자팝 · 친자검사 #4</span></div>
+        </div>
+        <div class="s4-card">
+          <img src="/screens/yajacamp-header.png" alt="">
+          <span class="badge">On Air</span>
+          <div class="name">YAJA CAMP<span class="ko">야자캠프 · K-Short Drama</span></div>
+        </div>
+        <div class="s4-card">
+          <img src="/screens/ycn-tiktok.png" alt="">
+          <span class="badge">On Air</span>
+          <div class="name">YCN<span class="ko">영찍남 · YCN Strange Man</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Final CTA -->
+    <section class="scene scene-5" id="scene5">
+      <h2 class="s5-title">
+        함께<br>
+        <span class="red">새로운 IP</span>를<br>
+        만들어 봅시다.
+      </h2>
+      <p class="s5-sub">캠페인 문의 · 채용 · 미디어 협업 — info@yajacamp.com</p>
+      <div class="s5-actions">
+        <a href="mailto:info@yajacamp.com" class="s5-cta">Contact YAJA →</a>
+        <a href="#" class="s5-cta ghost">전체 작품 보기</a>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- Progress bar -->
+<div class="progress" id="progress"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ------- Build the background poster grid (40 cells) -------
+const screens = [
+  '/screens/yajacamp-ig.png',
+  '/screens/yajacamp-header.png',
+  '/screens/ycn-tiktok.png',
+  '/screens/ycn-header.png',
+  '/screens/persol-ig.png',
+  '/screens/persol-header.png',
+];
+const bgGrid = document.getElementById('bgFixed');
+for (let i = 0; i < 40; i++) {
+  const cell = document.createElement('div');
+  cell.className = 'bg-cell';
+  cell.style.backgroundImage = `url('${screens[(i * 3 + 1) % screens.length]}')`;
+  bgGrid.appendChild(cell);
+}
+
+// ------- Animate the background grid throughout entire scroll -------
+gsap.timeline({
+  scrollTrigger: {
+    trigger: '.story',
+    start: 'top top',
+    end: 'bottom bottom',
+    scrub: true,
+  }
+})
+.fromTo('.bg-fixed', { scale: 1.1, rotate: 0 }, { scale: 1.25, rotate: -1.5, ease: 'none' }, 0)
+.to('.bg-fixed', { scale: 1.05, rotate: 0.8, ease: 'none' }, 0.4)
+.to('.bg-fixed', { scale: 0.85, rotate: 0, ease: 'power2.out' }, 0.8);   // scene 5 zoom-out
+
+// ------- Scene cross-fades driven by scroll progress -------
+// Each scene gets:
+//   - fade-in scale-down  during a 0.07 window
+//   - hold              for 0.06 window
+//   - fade-out scale-down during a 0.07 window
+
+const scenes = [
+  { sel: '#scene1', label: '01 / 05 — Brand', enterStart: 0.00, enterEnd: 0.06, exitStart: 0.15, exitEnd: 0.21 },
+  { sel: '#scene2', label: '02 / 05 — Featured', enterStart: 0.20, enterEnd: 0.26, exitStart: 0.36, exitEnd: 0.42 },
+  { sel: '#scene3', label: '03 / 05 — Numbers',  enterStart: 0.41, enterEnd: 0.47, exitStart: 0.57, exitEnd: 0.63 },
+  { sel: '#scene4', label: '04 / 05 — On Air',   enterStart: 0.62, enterEnd: 0.68, exitStart: 0.78, exitEnd: 0.84 },
+  { sel: '#scene5', label: '05 / 05 — Contact',  enterStart: 0.83, enterEnd: 0.89, exitStart: 1.10, exitEnd: 1.20 },
+];
+
+scenes.forEach((s, i) => {
+  const el = document.querySelector(s.sel);
+
+  if (i === 0) {
+    // Scene 1: visible at start, only animates the exit
+    gsap.set(el, { opacity: 1, scale: 1 });
+    gsap.timeline({
+      scrollTrigger: { trigger: '.story', start: 'top top', end: 'bottom bottom', scrub: true }
+    })
+    .to(el, { opacity: 0, scale: 0.85, ease: 'power2.in' }, s.exitStart);
+  } else {
+    // Other scenes: hidden, zoom in from 1.25 then fade out shrinking
+    gsap.set(el, { opacity: 0, scale: 1.25 });
+    gsap.timeline({
+      scrollTrigger: { trigger: '.story', start: 'top top', end: 'bottom bottom', scrub: true }
+    })
+    .to(el, { opacity: 1, scale: 1, ease: 'power2.out' }, s.enterStart)
+    .to(el, { opacity: 0, scale: 0.85, ease: 'power2.in' }, s.exitStart);
+  }
+});
+
+// ------- Number count-up for Scene 3 (triggered when scene becomes visible) -------
+const nums = document.querySelectorAll('.scene-3 .num');
+let s3Triggered = false;
+ScrollTrigger.create({
+  trigger: '.story',
+  start: 'top top',
+  end: 'bottom bottom',
+  onUpdate: self => {
+    if (self.progress >= 0.43 && !s3Triggered) {
+      s3Triggered = true;
+      nums.forEach(el => {
+        const target = parseInt(el.dataset.target, 10);
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target,
+          duration: 1.4,
+          ease: 'power2.out',
+          onUpdate: () => el.textContent = Math.round(obj.v)
+        });
+      });
+    }
+    if (self.progress < 0.4) {
+      s3Triggered = false;
+      nums.forEach(el => el.textContent = '0');
+    }
+  }
+});
+
+// ------- Progress bar + scene counter -------
+const counter = document.getElementById('counter');
+const progress = document.getElementById('progress');
+ScrollTrigger.create({
+  trigger: '.story',
+  start: 'top top',
+  end: 'bottom bottom',
+  onUpdate: self => {
+    progress.style.width = `${(self.progress * 100).toFixed(1)}%`;
+    // Find active scene
+    let active = scenes[0];
+    for (const s of scenes) {
+      if (self.progress >= s.enterStart) active = s;
+    }
+    counter.innerHTML = `<span class="red">${active.label.split(' ')[0]}</span> / ${active.label.split('/')[1]}`;
+  }
+});
+</script>
+</body>
+</html>
