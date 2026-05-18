@@ -22,31 +22,26 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  /* Fixed poster wall — always visible, lightly animated */
-  .bg-fixed {
+  /* AI-generated YAJA ambient loop — global background video */
+  .bg-video {
     position: fixed;
-    inset: -5%;
-    z-index: 0;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-template-rows: repeat(5, 1fr);
-    gap: 8px;
-    transform-origin: center center;
-    will-change: transform;
-  }
-  .bg-cell {
-    position: relative;
-    background-color: #0c0c0c;
-    background-size: cover;
-    background-position: center;
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .bg-cell::after {
-    content: '';
-    position: absolute;
     inset: 0;
-    background: linear-gradient(rgba(20,20,20,.55), rgba(0,0,0,.85));
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    will-change: opacity, transform;
+  }
+  .bg-video video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Legacy poster grid — kept hidden as fallback */
+  .bg-fixed {
+    display: none;
   }
 
   /* Soft red orb for ambient depth */
@@ -373,7 +368,14 @@
   <span class="red">01</span> / 05 — Brand
 </div>
 
-<!-- Fixed poster wall — animated via GSAP -->
+<!-- Global YAJA logo ambient loop video (AI-generated via Seedance 2.0) -->
+<div class="bg-video">
+  <video autoplay muted loop playsinline preload="auto">
+    <source src="/videos/yaja-bg-loop.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- Legacy poster wall (hidden, kept for reference) -->
 <div class="bg-fixed" id="bgFixed"></div>
 
 <!-- Ambient red orb layer -->
@@ -383,14 +385,12 @@
 <div class="story" id="story">
   <div class="stage" id="stage">
 
-    <!-- Scene 1: Brand Reveal -->
+    <!-- Scene 1: Brand Reveal
+         The YAJA logo is now provided by the global background video,
+         so the foreground only carries the eyebrow + headline copy. -->
     <section class="scene scene-1" id="scene1">
       <p class="s1-eyebrow">— K-Short Drama Studio · Est. 2024</p>
-      <h1 class="s1-title">
-        <span>YAJA</span>
-        <img src="/logos/fire-symbol/red-symbol.png" class="s1-flame" alt="">
-      </h1>
-      <p class="s1-sub">
+      <p class="s1-sub" style="margin-top: 32px;">
         대한민국 <span class="red">No.1</span> 숏폼 드라마 스튜디오.
       </p>
     </section>
@@ -490,7 +490,9 @@ for (let i = 0; i < 40; i++) {
   bgGrid.appendChild(cell);
 }
 
-// ------- Animate the background grid throughout entire scroll -------
+// ------- Animate the background video subtly across the scroll -------
+// Slight scale & opacity drift to suggest depth without distracting from
+// foreground content. The video itself provides its own ambient motion.
 gsap.timeline({
   scrollTrigger: {
     trigger: '.story',
@@ -499,9 +501,9 @@ gsap.timeline({
     scrub: true,
   }
 })
-.fromTo('.bg-fixed', { scale: 1.1, rotate: 0 }, { scale: 1.25, rotate: -1.5, ease: 'none' }, 0)
-.to('.bg-fixed', { scale: 1.05, rotate: 0.8, ease: 'none' }, 0.4)
-.to('.bg-fixed', { scale: 0.85, rotate: 0, ease: 'power2.out' }, 0.8);   // scene 5 zoom-out
+.fromTo('.bg-video', { scale: 1.0,  opacity: 1.0 }, { scale: 1.05, opacity: 0.5, ease: 'none' }, 0)
+.to('.bg-video',     { scale: 1.08, opacity: 0.4, ease: 'none' }, 0.5)
+.to('.bg-video',     { scale: 1.0,  opacity: 0.9, ease: 'power2.out' }, 0.9);  // brand returns at Contact
 
 // ------- Scene transitions driven directly by scroll progress -------
 // Single ScrollTrigger with onUpdate; we compute each scene's opacity
