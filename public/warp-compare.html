@@ -117,7 +117,57 @@
 </head>
 <body>
   <h1>YAJA LED Warp — 全パターン比較</h1>
-  <p class="sub">🆕🟢 FILL-MEGA/VERTICAL/EXTREME 追加 — 上下フルに伸ばす最新版</p>
+
+  <!-- ===== TROUGH series: true cylinder projection (y-axis curve only) ===== -->
+  <div class="panel recommended" style="border-color:#fb923c;background:rgba(251,146,60,0.06);">
+    <div class="panel-head">
+      <h2>🛢 TROUGH-DEEP — ★最新本命★</h2>
+      <span class="label" style="background:#fb923c;color:#fff;">横倒し樽内部</span>
+    </div>
+    <div class="panel-meta">geq cylinder projection (scale_x=1.5+1.5*c, θ=atan(1.2*ny))</div>
+    <img src="/logos/yaja-led-trough-deep.jpg" alt="Trough deep">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      🛢 x軸中央が最奥、上下に行くほど手前。本物の cylinder projection
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#fb923c;background:rgba(251,146,60,0.06);">
+    <div class="panel-head">
+      <h2>🛢 TROUGH-TIGHT — シャープ版</h2>
+      <span class="label" style="background:#fb923c;color:#fff;">標準曲率</span>
+    </div>
+    <div class="panel-meta">geq standard (scale_x=1+c, θ=2*atan(ny)) + tight crop</div>
+    <img src="/logos/yaja-led-trough-tight.jpg" alt="Trough tight">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      🛢 数学的に正しい trough projection、控えめ
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#fb923c;background:rgba(251,146,60,0.06);">
+    <div class="panel-head">
+      <h2>🛢 TROUGH-EXTREME — MAX</h2>
+      <span class="label" style="background:#fb923c;color:#fff;">極限曲率</span>
+    </div>
+    <div class="panel-meta">geq (scale_x=1+2c, θ=atan(1.4*ny)) + vignette PI/3.5</div>
+    <img src="/logos/yaja-led-trough-extreme.jpg" alt="Trough extreme">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      🛢🛢 最大の cylinder curvature、letters が大きく rim へ流れる
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#fb923c;background:rgba(251,146,60,0.06);">
+    <div class="panel-head">
+      <h2>🛢 TROUGH-MILD — 控えめ</h2>
+      <span class="label" style="background:#fb923c;color:#fff;">弱曲率</span>
+    </div>
+    <div class="panel-meta">geq standard, 余白あり (元ソースのまま)</div>
+    <img src="/logos/yaja-led-trough-mild.jpg" alt="Trough mild">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      🛢 ほとんど元画像に近い、ごく控えめな trough
+    </p>
+  </div>
+
+  <p class="sub">🆕🛢 TROUGH シリーズ — 本物の cylinder 投影 (geq で書き下ろし)</p>
 
   <div class="reference">
     <h3>0. ORIGINAL — 歪みなし</h3>
@@ -373,7 +423,9 @@
   <div class="pick">
     <p>
       気に入った番号を教えてください<br><br>
-      <strong>🟢 最新候補（上下フル+砂時計）</strong><br>
+      <strong>🛢 本物の cylinder 投影（最推奨）</strong><br>
+      <code>trough-deep</code> / <code>trough-tight</code> / <code>trough-extreme</code> / <code>trough-mild</code><br><br>
+      <strong>🟢 fill 系（上下フル+砂時計）</strong><br>
       <code>fill-mega</code> / <code>fill-vertical</code> / <code>fill-extreme</code><br>
       <code>pin-max</code> / <code>pin-insane</code><br><br>
       <strong>🌀 砂時計</strong><br>
