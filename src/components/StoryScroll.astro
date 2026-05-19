@@ -22,6 +22,22 @@ import { hero, stats, projects } from "@/lib/site";
 const proj1 = projects[0]; // Vaseline
 const proj2 = projects[1]; // Samsung
 const gridProjects = projects.slice(0, 4);
+
+// 36 drama thumbnails extracted from YAJA project videos at varied
+// timestamps (8 frames × 4 projects + 4 misc). Split into 8 vertical
+// columns of varied length so each column can scroll at its own speed,
+// mimicking the Banas reference's flurry of magazine posters.
+const ALL_THUMBS = Array.from({ length: 36 }, (_, i) =>
+  `/screens/grid/thumb-${String(i + 1).padStart(2, "0")}.jpg`,
+);
+const COLS = 8;
+const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
+  // Distribute thumbs round-robin-ish, with a small offset per column
+  // so neighboring columns aren't identical.
+  const offset = (c * 5) % ALL_THUMBS.length;
+  const len = 5 + (c % 3); // 5, 6, or 7 per column
+  return Array.from({ length: len }, (_, i) => ALL_THUMBS[(offset + i * 3) % ALL_THUMBS.length]);
+});
 ---
 
 <!-- ===== Fixed LED background video (behind everything) ===== -->
@@ -171,23 +187,22 @@ const gridProjects = projects.slice(0, 4);
           </p>
         </div>
         <div class="steps-right">
-          {
-            gridProjects.map((p) => (
-              <div class="thumb">
-                {p.video && (
-                  <video
-                    src={p.video}
-                    autoplay
-                    muted
-                    loop
-                    playsinline
-                    preload="metadata"
-                  />
-                )}
-                <span class="thumb-tag">{p.brand}</span>
-              </div>
-            ))
-          }
+          <!-- 4-column vertical marquee — Banas signature poster flurry,
+               built from YAJA drama frame stills. Each column scrolls
+               at its own speed. Set inert via aria-hidden so screen
+               readers don't get spammed. -->
+          <div class="marquee steps-marquee" aria-hidden="true">
+            {
+              marqueeColumns.slice(0, 4).map((col, c) => (
+                <div class={`marquee-col mq-${c}`}>
+                  {/* duplicate the column twice so the loop is seamless */}
+                  {[...col, ...col].map((src, i) => (
+                    <img src={src} alt="" loading="lazy" />
+                  ))}
+                </div>
+              ))
+            }
+          </div>
         </div>
       </div>
     </section>
@@ -228,37 +243,15 @@ const gridProjects = projects.slice(0, 4);
 
     <!-- Scene 7: Final logo + CTA — Banas "Banas™ Start for free" moment -->
     <section class="scene scene-final" id="scene7">
-      <!-- Project grid bg, behind the centered YAJA lockup -->
-      <div class="final-grid">
+      <!-- 8-column vertical marquee bg, behind the centered YAJA lockup.
+           This is the climactic Banas-style flurry-of-posters effect. -->
+      <div class="marquee final-marquee" aria-hidden="true">
         {
-          gridProjects.map((p) => (
-            <div class="final-thumb">
-              {p.video && (
-                <video
-                  src={p.video}
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                  preload="metadata"
-                />
-              )}
-            </div>
-          ))
-        }
-        {
-          gridProjects.map((p) => (
-            <div class="final-thumb">
-              {p.video && (
-                <video
-                  src={p.video}
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                  preload="metadata"
-                />
-              )}
+          marqueeColumns.map((col, c) => (
+            <div class={`marquee-col mq-${c}`}>
+              {[...col, ...col].map((src, i) => (
+                <img src={src} alt="" loading="lazy" />
+              ))}
             </div>
           ))
         }
@@ -735,28 +728,101 @@ const gridProjects = projects.slice(0, 4);
   .scene-final {
     padding: 0;
   }
-  .final-grid {
+
+  /* ===== Vertical marquee (Banas flurry-of-posters) =====
+     Each column scrolls vertically at its own speed via CSS
+     keyframes. We duplicate the column content (rendered twice
+     server-side) and translate -50% so the loop is seamless. */
+  .marquee {
+    display: flex;
+    gap: 10px;
+    overflow: hidden;
+    position: relative;
+  }
+  .marquee::before,
+  .marquee::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 14%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .marquee::before {
+    top: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent);
+  }
+  .marquee::after {
+    bottom: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), transparent);
+  }
+  .marquee-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    will-change: transform;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .marquee-col img {
+    width: 100%;
+    aspect-ratio: 9 / 14;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #111;
+    display: block;
+  }
+
+  /* 4 down + 4 up, all different durations so no two columns sync */
+  @keyframes mq-down {
+    from { transform: translate3d(0, -50%, 0); }
+    to   { transform: translate3d(0, 0, 0); }
+  }
+  @keyframes mq-up {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(0, -50%, 0); }
+  }
+  .mq-0 { animation-name: mq-up;   animation-duration: 38s; }
+  .mq-1 { animation-name: mq-down; animation-duration: 46s; }
+  .mq-2 { animation-name: mq-up;   animation-duration: 32s; }
+  .mq-3 { animation-name: mq-down; animation-duration: 52s; }
+  .mq-4 { animation-name: mq-up;   animation-duration: 44s; }
+  .mq-5 { animation-name: mq-down; animation-duration: 36s; }
+  .mq-6 { animation-name: mq-up;   animation-duration: 50s; }
+  .mq-7 { animation-name: mq-down; animation-duration: 42s; }
+
+  /* steps scene — marquee on the right half, contained within the
+     scene padding so it doesn't bleed onto the text. */
+  .steps-marquee {
+    max-height: 80vh;
+    padding: 0;
+    border-radius: 8px;
+  }
+  .steps-marquee .marquee-col img {
+    aspect-ratio: 9 / 14;
+  }
+
+  /* final scene — marquee fills the entire stage as bg */
+  .final-marquee {
     position: absolute;
     inset: 0;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    grid-auto-rows: 1fr;
-    gap: 8px;
-    padding: 32px;
+    padding: 16px;
     opacity: 0.55;
     z-index: 1;
   }
-  .final-thumb {
-    position: relative;
+  .final-marquee .marquee-col img {
     aspect-ratio: 9 / 14;
-    background: #111;
-    border-radius: 6px;
-    overflow: hidden;
   }
-  .final-thumb video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+
+  /* Respect reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-col {
+      animation: none !important;
+      transform: translate3d(0, -25%, 0);
+    }
   }
   .final-center {
     position: relative;
