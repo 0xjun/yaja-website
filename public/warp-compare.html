@@ -49,6 +49,9 @@
     letter-spacing: 0.22em;
     text-transform: uppercase;
   }
+  .panel-head .label.warning {
+    color: #F59E0B;
+  }
   .panel-meta {
     color: #888;
     font-size: 12px;
@@ -61,14 +64,29 @@
     display: block;
     border-radius: 4px;
   }
+  .panel.recommended {
+    border: 2px solid #FF4848;
+    padding: 24px;
+    border-radius: 8px;
+    background: rgba(255,72,72,0.05);
+  }
+  .panel.recommended .label {
+    background: #FF4848;
+    color: #fff;
+    padding: 4px 10px;
+    border-radius: 4px;
+  }
   .reference {
     border: 1px dashed #333;
     padding: 24px;
     border-radius: 8px;
     margin-bottom: 80px;
+    max-width: 1400px;
+    margin-left: auto;
+    margin-right: auto;
   }
   .reference h3 {
-    color: #FF4848;
+    color: #888;
     font-size: 11px;
     letter-spacing: 0.22em;
     text-transform: uppercase;
@@ -76,8 +94,9 @@
     margin-bottom: 12px;
   }
   .pick {
+    max-width: 1400px;
+    margin: 40px auto;
     text-align: center;
-    margin-top: 40px;
     padding: 30px;
     background: rgba(255,72,72,0.08);
     border: 1px solid rgba(255,72,72,0.3);
@@ -85,7 +104,7 @@
   }
   .pick p {
     font-size: 16px;
-    line-height: 1.6;
+    line-height: 1.8;
   }
   .pick code {
     background: #1a1a1a;
@@ -97,21 +116,18 @@
 </style>
 </head>
 <body>
-  <h1>YAJA LED Warp — 3段階比較</h1>
-  <p class="sub">Banas風の歪み（樽型 + パース + ビネット）を 3 強度で比較</p>
+  <h1>YAJA LED Warp — 6種類比較</h1>
+  <p class="sub">弱→強の順。ロゴが判別できる「Strong V2 / Tilt」が現状ベスト推奨</p>
 
   <div class="reference">
-    <h3>0. Reference — 元の歪みなし版</h3>
-    <img src="/logos/yaja-chrome.jpg" alt="Original chrome logo (no warp)">
-    <p style="color:#888;font-size:13px;margin-top:12px;">
-      ※ 比較用に元のミラーボール版を表示
-    </p>
+    <h3>0. ORIGINAL — 歪みなし</h3>
+    <img src="/logos/yaja-chrome.jpg" alt="Original (no warp)">
   </div>
 
   <div class="panel">
     <div class="panel-head">
-      <h2>1. MILD（控えめ）</h2>
-      <span class="label">弱い歪み</span>
+      <h2>1. MILD</h2>
+      <span class="label">控えめ</span>
     </div>
     <div class="panel-meta">k1=-0.10 / perspective=±5-8px / vignette=PI/4</div>
     <img src="/logos/yaja-led-mild.jpg" alt="Mild warp">
@@ -119,8 +135,8 @@
 
   <div class="panel">
     <div class="panel-head">
-      <h2>2. MEDIUM（中程度）</h2>
-      <span class="label">バランス型</span>
+      <h2>2. MEDIUM</h2>
+      <span class="label">中</span>
     </div>
     <div class="panel-meta">k1=-0.20 / perspective=±10-20px / vignette=PI/3.6</div>
     <img src="/logos/yaja-led-medium.jpg" alt="Medium warp">
@@ -128,18 +144,70 @@
 
   <div class="panel">
     <div class="panel-head">
-      <h2>3. STRONG（強め・Banas寄り）</h2>
-      <span class="label">広角レンズ</span>
+      <h2>3. STRONG</h2>
+      <span class="label">強め</span>
     </div>
     <div class="panel-meta">k1=-0.32 / perspective=±20-35px / vignette=PI/3.2</div>
     <img src="/logos/yaja-led-strong.jpg" alt="Strong warp">
   </div>
 
+  <div class="panel recommended">
+    <div class="panel-head">
+      <h2>4. STRONG V2 — ★ NEW ★</h2>
+      <span class="label">ズームイン</span>
+    </div>
+    <div class="panel-meta">crop 80% (zoom-in) + k1=-0.30 + perspective + unsharp</div>
+    <img src="/logos/yaja-led-strong-v2.jpg" alt="Strong V2 (zoomed)">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      ※ クロップでロゴをフレームいっぱいに、Banas寄りの「至近距離」感
+    </p>
+  </div>
+
+  <div class="panel recommended">
+    <div class="panel-head">
+      <h2>5. TILT — ★ NEW ★</h2>
+      <span class="label">傾き付き</span>
+    </div>
+    <div class="panel-meta">crop + 2° rotate + k1=-0.30 + perspective + unsharp</div>
+    <img src="/logos/yaja-led-tilt.jpg" alt="Tilt warp">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      ※ Strong V2 に 2度の傾きを追加。Banas の「不安定な広角感」に近い
+    </p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>6. ULTRA</h2>
+      <span class="label warning">行き過ぎ</span>
+    </div>
+    <div class="panel-meta">k1=-0.45 / perspective=±30-80px / vignette=PI/2.8 / crop 92%</div>
+    <img src="/logos/yaja-led-ultra.jpg" alt="Ultra warp">
+    <p style="color:#F59E0B;font-size:13px;margin-top:12px;">
+      ⚠️ ロゴが認識しにくいレベル。アート寄り
+    </p>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head">
+      <h2>7. BANAS-MATCH</h2>
+      <span class="label warning">過剰歪み</span>
+    </div>
+    <div class="panel-meta">scale 1.25 + k1=-0.55 + 80-180px perspective + crop 78%</div>
+    <img src="/logos/yaja-led-banas.jpg" alt="Banas match">
+    <p style="color:#F59E0B;font-size:13px;margin-top:12px;">
+      ⚠️ 文字がほぼ判別不能。完全アート背景としてはアリ
+    </p>
+  </div>
+
   <div class="pick">
     <p>
-      気に入ったやつを教えてください。<br>
-      「<code>mild</code>」「<code>medium</code>」「<code>strong</code>」のどれか、<br>
-      または「<code>medium と strong の中間</code>」のような中間も指定OK。
+      気に入った番号を教えてください<br><br>
+      <code>strong-v2</code>（4番、推奨）<br>
+      <code>tilt</code>（5番、傾き付き）<br>
+      <code>strong</code>（3番、控えめ）<br>
+      <code>ultra</code>（6番、攻め）<br>
+      <code>banas</code>（7番、過剰）<br><br>
+      または <code>もっと○○して</code> で再生成します
     </p>
   </div>
 </body>
