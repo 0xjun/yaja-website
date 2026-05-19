@@ -24,20 +24,34 @@ const proj2 = projects[1]; // Samsung
 const gridProjects = projects.slice(0, 4);
 
 // 36 drama thumbnails extracted from YAJA project videos at varied
-// timestamps (8 frames × 4 projects + 4 misc). Split into 8 vertical
-// columns of varied length so each column can scroll at its own speed,
-// mimicking the Banas reference's flurry of magazine posters.
+// timestamps. These pop into the grid one-by-one (Banas-style
+// stagger entrance) at the climax of the scroll.
 const ALL_THUMBS = Array.from({ length: 36 }, (_, i) =>
   `/screens/grid/thumb-${String(i + 1).padStart(2, "0")}.jpg`,
 );
-const COLS = 8;
-const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
-  // Distribute thumbs round-robin-ish, with a small offset per column
-  // so neighboring columns aren't identical.
-  const offset = (c * 5) % ALL_THUMBS.length;
-  const len = 5 + (c % 3); // 5, 6, or 7 per column
-  return Array.from({ length: len }, (_, i) => ALL_THUMBS[(offset + i * 3) % ALL_THUMBS.length]);
-});
+
+// We use 32 thumbs for a clean 8 col × 4 row final grid. Each gets a
+// pseudo-random delay so the appearance order feels organic — but
+// deterministic across page loads so the SSR markup stays stable.
+const FINAL_THUMBS = ALL_THUMBS.slice(0, 32);
+// Halton-2 sequence yields a well-distributed [0,1] for staggered timings.
+function halton(i: number, base: number): number {
+  let f = 1, r = 0, k = i + 1;
+  while (k > 0) { f /= base; r += f * (k % base); k = Math.floor(k / base); }
+  return r;
+}
+const finalThumbsWithDelay = FINAL_THUMBS.map((src, i) => ({
+  src,
+  delay: halton(i, 2), // 0..1 normalized
+}));
+
+// Steps scene uses a smaller subset (8 in a 4×2 layout) with the
+// same stagger idea but a tighter window.
+const STEPS_THUMBS = ALL_THUMBS.slice(8, 16);
+const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
+  src,
+  delay: halton(i, 2),
+}));
 ---
 
 <!-- ===== Fixed LED background video (behind everything) ===== -->
@@ -187,18 +201,15 @@ const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
           </p>
         </div>
         <div class="steps-right">
-          <!-- 4-column vertical marquee — Banas signature poster flurry,
-               built from YAJA drama frame stills. Each column scrolls
-               at its own speed. Set inert via aria-hidden so screen
-               readers don't get spammed. -->
-          <div class="marquee steps-marquee" aria-hidden="true">
+          <!-- 4×2 grid of YAJA drama stills. Each thumb POP-INs at its
+               own scroll-progress moment for the Banas "バババっと" feel.
+               data-delay (0..1) is interpolated against the steps-scene
+               window in script. -->
+          <div class="thumb-grid steps-grid-thumbs" aria-hidden="true">
             {
-              marqueeColumns.slice(0, 4).map((col, c) => (
-                <div class={`marquee-col mq-${c}`}>
-                  {/* duplicate the column twice so the loop is seamless */}
-                  {[...col, ...col].map((src, i) => (
-                    <img src={src} alt="" loading="lazy" />
-                  ))}
+              stepsThumbsWithDelay.map(({ src, delay }) => (
+                <div class="pop-thumb" data-delay={delay.toFixed(3)}>
+                  <img src={src} alt="" loading="lazy" />
                 </div>
               ))
             }
@@ -243,15 +254,15 @@ const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
 
     <!-- Scene 7: Final logo + CTA — Banas "Banas™ Start for free" moment -->
     <section class="scene scene-final" id="scene7">
-      <!-- 8-column vertical marquee bg, behind the centered YAJA lockup.
-           This is the climactic Banas-style flurry-of-posters effect. -->
-      <div class="marquee final-marquee" aria-hidden="true">
+      <!-- 8×4 grid of YAJA drama stills as scene bg. Each thumb POP-INs
+           at its own delayed scroll moment — that's the Banas-style
+           "バババっと" flurry where the grid assembles one tile at a
+           time over a couple seconds of scroll. -->
+      <div class="thumb-grid final-grid-thumbs" aria-hidden="true">
         {
-          marqueeColumns.map((col, c) => (
-            <div class={`marquee-col mq-${c}`}>
-              {[...col, ...col].map((src, i) => (
-                <img src={src} alt="" loading="lazy" />
-              ))}
+          finalThumbsWithDelay.map(({ src, delay }) => (
+            <div class="pop-thumb" data-delay={delay.toFixed(3)}>
+              <img src={src} alt="" loading="lazy" />
             </div>
           ))
         }
@@ -729,99 +740,58 @@ const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
     padding: 0;
   }
 
-  /* ===== Vertical marquee (Banas flurry-of-posters) =====
-     Each column scrolls vertically at its own speed via CSS
-     keyframes. We duplicate the column content (rendered twice
-     server-side) and translate -50% so the loop is seamless. */
-  .marquee {
-    display: flex;
-    gap: 10px;
-    overflow: hidden;
-    position: relative;
+  /* ===== Stagger pop-in thumb grid (Banas "バババっと" flurry) =====
+     Each .pop-thumb gets a data-delay (0..1). The script reads scroll
+     progress and per-thumb interpolates opacity + scale + blur from
+     "not yet" → "fully landed". When many thumbs share a scroll window
+     with random delays, the eye sees them pop in one after another. */
+  .thumb-grid {
+    display: grid;
+    gap: 8px;
   }
-  .marquee::before,
-  .marquee::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    height: 14%;
-    pointer-events: none;
-    z-index: 2;
-  }
-  .marquee::before {
-    top: 0;
-    background: linear-gradient(180deg, rgba(0, 0, 0, 0.85), transparent);
-  }
-  .marquee::after {
-    bottom: 0;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.85), transparent);
-  }
-  .marquee-col {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 0;
-    will-change: transform;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-  .marquee-col img {
-    width: 100%;
+  .pop-thumb {
     aspect-ratio: 9 / 14;
-    object-fit: cover;
     border-radius: 6px;
+    overflow: hidden;
     background: #111;
+    opacity: 0;
+    transform: scale(1.35);
+    filter: blur(8px);
+    will-change: opacity, transform, filter;
+  }
+  .pop-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     display: block;
   }
 
-  /* 4 down + 4 up, all different durations so no two columns sync */
-  @keyframes mq-down {
-    from { transform: translate3d(0, -50%, 0); }
-    to   { transform: translate3d(0, 0, 0); }
-  }
-  @keyframes mq-up {
-    from { transform: translate3d(0, 0, 0); }
-    to   { transform: translate3d(0, -50%, 0); }
-  }
-  .mq-0 { animation-name: mq-up;   animation-duration: 38s; }
-  .mq-1 { animation-name: mq-down; animation-duration: 46s; }
-  .mq-2 { animation-name: mq-up;   animation-duration: 32s; }
-  .mq-3 { animation-name: mq-down; animation-duration: 52s; }
-  .mq-4 { animation-name: mq-up;   animation-duration: 44s; }
-  .mq-5 { animation-name: mq-down; animation-duration: 36s; }
-  .mq-6 { animation-name: mq-up;   animation-duration: 50s; }
-  .mq-7 { animation-name: mq-down; animation-duration: 42s; }
-
-  /* steps scene — marquee on the right half, contained within the
-     scene padding so it doesn't bleed onto the text. */
-  .steps-marquee {
-    max-height: 80vh;
-    padding: 0;
-    border-radius: 8px;
-  }
-  .steps-marquee .marquee-col img {
-    aspect-ratio: 9 / 14;
+  /* steps scene — 4×2 grid on the right column */
+  .steps-grid-thumbs {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    max-width: 540px;
   }
 
-  /* final scene — marquee fills the entire stage as bg */
-  .final-marquee {
+  /* final scene — 8×4 grid filling the full stage as bg */
+  .final-grid-thumbs {
     position: absolute;
-    inset: 0;
-    padding: 16px;
+    inset: 16px;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(4, 1fr);
     opacity: 0.55;
     z-index: 1;
   }
-  .final-marquee .marquee-col img {
-    aspect-ratio: 9 / 14;
+  .final-grid-thumbs .pop-thumb {
+    border-radius: 5px;
   }
 
-  /* Respect reduced motion */
+  /* Respect reduced motion — show static at full state */
   @media (prefers-reduced-motion: reduce) {
-    .marquee-col {
-      animation: none !important;
-      transform: translate3d(0, -25%, 0);
+    .pop-thumb {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
     }
   }
   .final-center {
@@ -1051,6 +1021,7 @@ const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
       });
       applyIntroLines(p);
       applySloganLines(p);
+      applyPopThumbs(p);
       if (mark) {
         // Drift -40px → +40px across full scroll, slight scale.
         const dy = (p - 0.5) * 80;
@@ -1076,6 +1047,54 @@ const marqueeColumns: string[][] = Array.from({ length: COLS }, (_, c) => {
     });
   }
   applyIntroLines(0);
+
+  // ===== Pop-thumb stagger entrance (Banas "バババっと" effect) =====
+  // Two groups of thumbs land in two different scroll windows:
+  //   • steps group   — appears while scene-steps is on screen
+  //                     (scene fadeIn 0.55 → holdEnd 0.65). We map
+  //                     thumb delays (0..1) across 0.55 → 0.66.
+  //   • final group   — assembles as user enters the final scene.
+  //                     Window: 0.82 → 0.97 so they're mostly placed
+  //                     by the time the YAJA™ lockup is centered.
+  // Each thumb's window is 0.04 wide (~3% of total scroll) so popping
+  // feels punchy not slow.
+  interface PopGroup {
+    nodes: NodeListOf<HTMLElement>;
+    start: number;
+    end: number;
+  }
+  const POP_DURATION = 0.04;
+  const popGroups: PopGroup[] = [
+    {
+      nodes: document.querySelectorAll<HTMLElement>(
+        ".steps-grid-thumbs .pop-thumb",
+      ),
+      start: 0.55,
+      end: 0.66,
+    },
+    {
+      nodes: document.querySelectorAll<HTMLElement>(
+        ".final-grid-thumbs .pop-thumb",
+      ),
+      start: 0.82,
+      end: 0.97,
+    },
+  ];
+
+  function applyPopThumbs(p: number) {
+    popGroups.forEach((g) => {
+      g.nodes.forEach((el) => {
+        const delay = parseFloat(el.dataset.delay ?? "0");
+        const triggerStart = g.start + delay * (g.end - g.start);
+        const raw = clamp01((p - triggerStart) / POP_DURATION);
+        const t = easeOutCubic(raw);
+        el.style.opacity = String(t);
+        el.style.transform = `scale(${lerp(1.35, 1, t)})`;
+        el.style.filter = `blur(${lerp(8, 0, t)}px)`;
+      });
+    });
+  }
+  applyPopThumbs(0);
 
   // ===== Slogan line stagger (Scene 7, fadeIn at 0.84) =====
   const sloganLines = Array.from(
