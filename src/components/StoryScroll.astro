@@ -593,25 +593,51 @@ const featured = projects[0];
 
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
   const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+  // Ease-out cubic — fast at first then settles. Gives the "float up
+  // and gently land" feel.
+  const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
+  // Ease-in cubic — slow start then accelerates upward on exit.
+  const easeInCubic = (t: number) => t * t * t;
+
+  // Distance (px) each scene travels on entrance / exit. Tuned so
+  // it reads as "rises up from below the fold" without being so
+  // large it lags the scroll.
+  const ENTER_Y = 80; // starts 80px below center
+  const EXIT_Y = -60; // exits 60px above center
 
   function computeSceneState(p: number, s: SceneSpec) {
-    if (p < s.fadeIn) return { opacity: 0, scale: 1.25 };
+    // Before this scene's window — sit ready below, hidden.
+    if (p < s.fadeIn) return { opacity: 0, y: ENTER_Y, scale: 1.02 };
+
+    // Fade-in: rise from below + opacity 0→1.
     if (p < s.holdStart) {
-      const t = clamp01((p - s.fadeIn) / (s.holdStart - s.fadeIn));
-      return { opacity: t, scale: lerp(1.25, 1, t) };
+      const raw = clamp01((p - s.fadeIn) / (s.holdStart - s.fadeIn));
+      const t = easeOutCubic(raw);
+      return { opacity: t, y: lerp(ENTER_Y, 0, t), scale: lerp(1.02, 1, t) };
     }
-    if (p <= s.holdEnd) return { opacity: 1, scale: 1 };
+
+    // Hold: locked in place.
+    if (p <= s.holdEnd) return { opacity: 1, y: 0, scale: 1 };
+
+    // Fade-out: continue drifting up + fade.
     if (p <= s.fadeOut) {
-      const t = clamp01((p - s.holdEnd) / (s.fadeOut - s.holdEnd));
-      return { opacity: 1 - t, scale: lerp(1, 0.85, t) };
+      const raw = clamp01((p - s.holdEnd) / (s.fadeOut - s.holdEnd));
+      const t = easeInCubic(raw);
+      return { opacity: 1 - t, y: lerp(0, EXIT_Y, t), scale: lerp(1, 0.98, t) };
     }
-    return { opacity: 0, scale: 0.85 };
+
+    // After exit — parked above, hidden.
+    return { opacity: 0, y: EXIT_Y, scale: 0.98 };
   }
 
-  // Initial paint: scene 1 visible, rest hidden + scaled up
+  // Initial paint: scene 1 visible, rest hidden + parked below.
   sceneSpecs.forEach((s, i) => {
     if (!s.el) return;
-    gsap.set(s.el, i === 0 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.25 });
+    if (i === 0) {
+      gsap.set(s.el, { opacity: 1, y: 0, scale: 1 });
+    } else {
+      gsap.set(s.el, { opacity: 0, y: ENTER_Y, scale: 1.02 });
+    }
   });
 
   ScrollTrigger.create({
@@ -623,9 +649,9 @@ const featured = projects[0];
       const p = self.progress;
       sceneSpecs.forEach((s) => {
         if (!s.el) return;
-        const { opacity, scale } = computeSceneState(p, s);
+        const { opacity, y, scale } = computeSceneState(p, s);
         s.el.style.opacity = String(opacity);
-        s.el.style.transform = `scale(${scale})`;
+        s.el.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
       });
     },
   });
