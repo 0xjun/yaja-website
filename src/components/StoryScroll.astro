@@ -1159,25 +1159,35 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   const RAPID_END = 0.24;
   let rapidActive = -1;
 
+  // Each thumb slice is split into "show" + "gap" so the LED bg is
+  // briefly visible between thumbs — the eye reads it as discrete
+  // pops rather than a smooth slideshow. Tune VISIBLE_RATIO to
+  // change how long the thumb stays vs the gap.
+  const VISIBLE_RATIO = 0.55; // 55% thumb, 45% empty per slice
+
   function applyRapidThumbs(p: number) {
     if (rapidThumbs.length === 0) return;
     if (p < RAPID_START || p > RAPID_END) {
       if (rapidActive !== -1) {
-        // Outside the scene — clear the flag so re-entering animates fresh.
         rapidThumbs.forEach((el) => el.classList.remove("is-active"));
         rapidActive = -1;
       }
       return;
     }
     const local = (p - RAPID_START) / (RAPID_END - RAPID_START); // 0..1
-    const idx = Math.min(
-      rapidThumbs.length - 1,
-      Math.max(0, Math.floor(local * rapidThumbs.length)),
-    );
-    if (idx !== rapidActive) {
-      rapidThumbs[rapidActive]?.classList.remove("is-active");
-      rapidThumbs[idx]?.classList.add("is-active");
-      rapidActive = idx;
+    const scaled = local * rapidThumbs.length;
+    const idx = Math.min(rapidThumbs.length - 1, Math.floor(scaled));
+    const within = scaled - idx; // 0..1 inside this thumb's slice
+    // First VISIBLE_RATIO of the slice → show thumb; rest → gap.
+    const desired = within < VISIBLE_RATIO ? idx : -1;
+    if (desired !== rapidActive) {
+      if (rapidActive !== -1) {
+        rapidThumbs[rapidActive]?.classList.remove("is-active");
+      }
+      if (desired !== -1) {
+        rapidThumbs[desired]?.classList.add("is-active");
+      }
+      rapidActive = desired;
     }
   }
   // Paint initial state: show first thumb if we're already past 0
