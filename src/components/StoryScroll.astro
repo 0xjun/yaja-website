@@ -54,9 +54,10 @@ const finalThumbsWithDelay = FINAL_THUMBS.map((src, i) => ({
   delay: halton(i, 2), // 0..1 normalized
 }));
 
-// Steps scene uses a smaller subset (8 in a 4×2 layout) with the
-// same stagger idea but a tighter window.
-const STEPS_THUMBS = ALL_THUMBS.slice(8, 16);
+// Steps scene uses a wider, taller grid that bleeds off the right edge
+// of the viewport (Banas "Type. Generate. Ship." layout). 25 thumbs
+// give us 5 columns × 5 rows.
+const STEPS_THUMBS = ALL_THUMBS.slice(0, 25);
 const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   src,
   delay: halton(i, 2),
@@ -202,44 +203,32 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       </div>
     </section>
 
-    <!-- Scene 4: 3-step process — Banas "Type. Generate. Ship." moment -->
+    <!-- Scene 4: 3-step process — Banas "Type. Generate. Ship." layout
+         ported 1:1. Left text column with progressive emphasis, right
+         grid bleeds off the right edge of the viewport. -->
     <section class="scene scene-steps" id="scene4">
-      <div class="steps-grid">
-        <div class="steps-left">
-          <p class="steps-eyebrow">— How we work</p>
-          <ol class="steps-list">
-            <li class="step">
-              <span class="step-num">01.</span>
-              <span class="step-name">Concept.</span>
-            </li>
-            <li class="step">
-              <span class="step-num">02.</span>
-              <span class="step-name">Create.</span>
-            </li>
-            <li class="step">
-              <span class="step-num">03.</span>
-              <span class="step-name">Distribute.</span>
-            </li>
-          </ol>
-          <p class="steps-foot">
-            기획에서 송출까지, YAJA 한 곳에서.
-          </p>
-        </div>
-        <div class="steps-right">
-          <!-- 4×2 grid of YAJA drama stills. Each thumb POP-INs at its
-               own scroll-progress moment for the Banas "バババっと" feel.
-               data-delay (0..1) is interpolated against the steps-scene
-               window in script. -->
-          <div class="thumb-grid steps-grid-thumbs" aria-hidden="true">
-            {
-              stepsThumbsWithDelay.map(({ src, delay }) => (
-                <div class="pop-thumb" data-delay={delay.toFixed(3)}>
-                  <img src={src} alt="" loading="lazy" />
-                </div>
-              ))
-            }
-          </div>
-        </div>
+      <div class="steps-left">
+        <ol class="steps-list" aria-label="How YAJA works">
+          <li class="step step-1">Concept.</li>
+          <li class="step step-2">Create.</li>
+          <li class="step step-3">Distribute.</li>
+        </ol>
+        <p class="steps-foot">
+          Describe the story you want,<br />
+          YAJA delivers the drama.
+        </p>
+      </div>
+      <!-- Bleed-right grid of YAJA drama stills. Each pop-thumb is
+           tied to its own scroll-delay so the grid assembles as the
+           user scrolls into the scene (Banas "バババっと" feel). -->
+      <div class="thumb-grid steps-grid-thumbs" aria-hidden="true">
+        {
+          stepsThumbsWithDelay.map(({ src, delay }) => (
+            <div class="pop-thumb" data-delay={delay.toFixed(3)}>
+              <img src={src} alt="" loading="lazy" />
+            </div>
+          ))
+        }
       </div>
     </section>
 
@@ -680,100 +669,137 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     color: #6e7380;
   }
 
-  /* ----- scene-steps: Banas 3-step + poster grid ----- */
+  /* ----- scene-steps: Banas "Type. Generate. Ship." layout =====
+     Override the default .scene flex column so we can position the
+     left text and the bleed-right grid independently. */
   .scene-steps {
-    padding: 32px 4vw;
+    flex-direction: row !important;
+    align-items: stretch !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+    padding: 0 !important;
   }
-  .steps-grid {
-    display: grid;
-    grid-template-columns: 1fr 1.4fr;
-    gap: 6vw;
-    width: 100%;
-    max-width: 1280px;
-    align-items: center;
-  }
+  /* Left text column — fixed width, vertically centered, sits over
+     the LED bg. */
   .steps-left {
-    text-align: left;
-  }
-  .steps-eyebrow {
-    font-family: var(--font-num);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--color-yaja-red);
-    margin-bottom: 32px;
+    flex: 0 0 auto;
+    width: clamp(280px, 32vw, 460px);
+    padding: 0 clamp(40px, 5vw, 96px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 3;
   }
   .steps-list {
     list-style: none;
     padding: 0;
     margin: 0;
-  }
-  .step {
     display: flex;
-    align-items: baseline;
-    gap: 16px;
+    flex-direction: column;
+    gap: 6px;
+  }
+  /* Progressive emphasis: first word dim/light, second white, third
+     pure white biggest — matches Banas "Type. Generate. Ship." */
+  .step {
     font-family: var(--font-num);
     font-weight: 900;
-    font-size: clamp(40px, 6vw, 96px);
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-    color: #fff;
+    line-height: 0.95;
+    letter-spacing: -0.045em;
   }
-  .step-num {
-    font-size: 0.32em;
-    color: #6e7380;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+  .step-1 {
+    font-size: clamp(40px, 5.6vw, 92px);
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .step-2 {
+    font-size: clamp(48px, 6.6vw, 108px);
+    color: rgba(255, 255, 255, 0.85);
+  }
+  .step-3 {
+    font-size: clamp(56px, 7.4vw, 124px);
+    color: #fff;
   }
   .steps-foot {
     margin-top: 36px;
-    max-width: 32ch;
-    font-size: 14px;
+    max-width: 24ch;
+    font-size: 13px;
     color: #c8cdd7;
-    line-height: 1.6;
+    line-height: 1.55;
+    letter-spacing: 0.01em;
   }
-  .steps-right {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
-    max-width: 540px;
-  }
-  .thumb {
-    position: relative;
-    aspect-ratio: 9 / 14;
-    background: #111;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.08);
-  }
-  .thumb video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    opacity: 0.85;
-  }
-  .thumb-tag {
+  /* Right-bleed grid. Anchored to the right of the stage and pulled
+     past the edge so the last column gets clipped — that's the Banas
+     "wall of posters runs off the screen" feel. */
+  .steps-grid-thumbs {
     position: absolute;
-    bottom: 10px;
-    left: 12px;
-    font-family: var(--font-num);
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: #fff;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+    top: 0;
+    bottom: 0;
+    left: clamp(280px, 32vw, 460px);
+    right: -10vw;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 8px;
+    padding: 4vh 16px 4vh 0;
+    z-index: 2;
+  }
+  .steps-grid-thumbs .pop-thumb {
+    border-radius: 4px;
+    aspect-ratio: auto;
+  }
+  /* Soft fade on the right so the bleed feels intentional, not cut */
+  .steps-grid-thumbs::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 18%;
+    pointer-events: none;
+    background: linear-gradient(
+      270deg,
+      rgba(30, 30, 30, 0.85) 0%,
+      transparent 100%
+    );
+  }
+  /* Fade-left so text isn't fighting bright thumbs at the boundary */
+  .steps-grid-thumbs::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 12%;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(30, 30, 30, 0.75) 0%,
+      transparent 100%
+    );
+    z-index: 1;
   }
   @media (max-width: 900px) {
-    .steps-grid {
-      grid-template-columns: 1fr;
-      gap: 32px;
+    .scene-steps {
+      flex-direction: column !important;
+      justify-content: center !important;
     }
-    .steps-right {
-      grid-template-columns: repeat(2, 1fr);
-      max-width: 360px;
-      margin: 0 auto;
+    .steps-left {
+      width: 100%;
+      padding: 24px;
+      align-items: center;
+    }
+    .steps-list {
+      align-items: center;
+    }
+    .steps-grid-thumbs {
+      position: relative;
+      left: 0;
+      right: 0;
+      top: auto;
+      bottom: auto;
+      height: 40vh;
+      grid-template-columns: repeat(3, 1fr);
+      margin-top: 24px;
     }
   }
 
