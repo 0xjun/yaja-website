@@ -118,10 +118,47 @@
 <body>
   <h1>YAJA LED Warp — 全パターン比較</h1>
 
-  <!-- ===== TROUGH series: true cylinder projection (y-axis curve only) ===== -->
+  <!-- ===== LED PANEL series: procedural LED dot grid + trough + 3 sections ===== -->
+  <div class="panel recommended" style="border-color:#a78bfa;background:rgba(167,139,250,0.08);">
+    <div class="panel-head">
+      <h2>💎 LED-PANEL-MEDIUM — ★最新本命★</h2>
+      <span class="label" style="background:#a78bfa;color:#fff;">参照画像準拠</span>
+    </div>
+    <div class="panel-meta">procedural dot grid + trough(scale_x=1+0.3c) + 2 ribs at x=±0.333</div>
+    <img src="/logos/yaja-led-panel-medium.jpg" alt="LED panel medium">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      💎 参照画像（横倒し樽内部 LED）の構造を完全 procedural で再現
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#a78bfa;background:rgba(167,139,250,0.08);">
+    <div class="panel-head">
+      <h2>💎 LED-PANEL-MILD — フラット寄り</h2>
+      <span class="label" style="background:#a78bfa;color:#fff;">控えめ曲率</span>
+    </div>
+    <div class="panel-meta">scale_x=1+0.15c — 矩形いっぱい、曲率ほぼ無し</div>
+    <img src="/logos/yaja-led-panel-mild.jpg" alt="LED panel mild">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      💎 LED ほぼフラット、4 隅まで dot が満ちる
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#a78bfa;background:rgba(167,139,250,0.08);">
+    <div class="panel-head">
+      <h2>💎 LED-PANEL-DEEP — シルエット強</h2>
+      <span class="label" style="background:#a78bfa;color:#fff;">強曲率</span>
+    </div>
+    <div class="panel-meta">scale_x=1+0.5c — 顕著な )( hourglass シルエット</div>
+    <img src="/logos/yaja-led-panel-deep.jpg" alt="LED panel deep">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      💎💎 大きな樽の中に居る感、上下左右に黒い rim
+    </p>
+  </div>
+
+  <!-- ===== TROUGH series (YAJA logo warped through cylinder) ===== -->
   <div class="panel recommended" style="border-color:#fb923c;background:rgba(251,146,60,0.06);">
     <div class="panel-head">
-      <h2>🛢 TROUGH-DEEP — ★最新本命★</h2>
+      <h2>🛢 TROUGH-DEEP — ロゴ歪み</h2>
       <span class="label" style="background:#fb923c;color:#fff;">横倒し樽内部</span>
     </div>
     <div class="panel-meta">geq cylinder projection (scale_x=1.5+1.5*c, θ=atan(1.2*ny))</div>
@@ -167,7 +204,7 @@
     </p>
   </div>
 
-  <p class="sub">🆕🛢 TROUGH シリーズ — 本物の cylinder 投影 (geq で書き下ろし)</p>
+  <p class="sub">🆕💎 LED-PANEL シリーズ — procedural ドット格子 + 横倒し樽 trough + 3 セクションのリブ</p>
 
   <div class="reference">
     <h3>0. ORIGINAL — 歪みなし</h3>
@@ -423,7 +460,9 @@
   <div class="pick">
     <p>
       気に入った番号を教えてください<br><br>
-      <strong>🛢 本物の cylinder 投影（最推奨）</strong><br>
+      <strong>💎 LED ドットパネル（参照画像準拠）</strong><br>
+      <code>led-panel-medium</code> ★ / <code>led-panel-mild</code> / <code>led-panel-deep</code><br><br>
+      <strong>🛢 ロゴ自体を cylinder 投影</strong><br>
       <code>trough-deep</code> / <code>trough-tight</code> / <code>trough-extreme</code> / <code>trough-mild</code><br><br>
       <strong>🟢 fill 系（上下フル+砂時計）</strong><br>
       <code>fill-mega</code> / <code>fill-vertical</code> / <code>fill-extreme</code><br>
