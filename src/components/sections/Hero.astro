@@ -29,22 +29,28 @@ const letters = ["Y", "A", "J", "A"];
     {
       hero.video && (
         <video
-          src={hero.video}
           poster={hero.videoPoster || undefined}
           autoplay
           muted
           loop
           playsinline
           preload="metadata"
-          class="absolute inset-0 h-[110%] w-full -translate-y-[5%] scale-105 object-cover opacity-40"
-        />
+          class="absolute inset-0 h-[110%] w-full -translate-y-[5%] scale-105 object-cover opacity-75"
+        >
+          {/* WebM first for smaller file / faster start on Chrome/Firefox,
+              MP4 fallback for Safari. */}
+          <source src="/videos/yaja-led-bg.webm" type="video/webm" />
+          <source src={hero.video} type="video/mp4" />
+        </video>
       )
     }
 
-    <!-- Color wash over video -->
+    <!-- Soft color wash over video — lighter than before so the LED
+         bg's color zones still read through. Bottom dark fade keeps
+         the headline + CTAs legible. -->
     <div
       class="absolute inset-0"
-      style="background: linear-gradient(180deg, rgba(30,30,30,0.6) 0%, rgba(30,30,30,0.3) 40%, rgba(30,30,30,0.85) 100%);"
+      style="background: linear-gradient(180deg, rgba(30,30,30,0.35) 0%, rgba(30,30,30,0.15) 40%, rgba(30,30,30,0.75) 100%);"
     >
     </div>
 
