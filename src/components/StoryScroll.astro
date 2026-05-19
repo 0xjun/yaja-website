@@ -32,12 +32,12 @@ const ALL_THUMBS = Array.from({ length: 36 }, (_, i) =>
   `/screens/grid/thumb-${String(i + 1).padStart(2, "0")}.jpg`,
 );
 
-// Rapid-fire showcase (Banas 3-5s moment) — one thumb at a time
-// flashes centered, then is replaced by the next. We rotate through
-// 16 thumbs over ~4 seconds = 250ms per thumb. Pure CSS keyframes.
+// Rapid-fire showcase — scroll-driven flipbook. Each thumb owns a
+// 1/N slice of the scene's scroll window. As you scroll through the
+// scene, exactly one thumb is visible at a time and SNAPS to the next
+// when the scroll crosses the next threshold. Stop mid-slice and the
+// current thumb stays put (no auto-cycle).
 const RAPID_THUMBS = ALL_THUMBS.slice(0, 16);
-const RAPID_CYCLE_S = 4; // total loop duration
-const RAPID_SLOT = RAPID_CYCLE_S / RAPID_THUMBS.length; // each thumb's slot
 
 // We use 32 thumbs for a clean 8 col × 4 row final grid. Each gets a
 // pseudo-random delay so the appearance order feels organic — but
@@ -111,17 +111,14 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       </p>
     </section>
 
-    <!-- Scene 1b: Rapid-fire showcase — Banas 3-5s flurry where a single
-         centered ad swaps every ~250ms. Pure CSS keyframes per thumb,
-         scroll-independent. -->
+    <!-- Scene 1b: Rapid-fire showcase — scroll-driven flipbook.
+         Each thumb gets a 1/N slice of this scene's scroll progress;
+         the script flips exactly one visible at a time. -->
     <section class="scene scene-rapid" id="sceneRapid">
       <div class="rapid-stage" aria-hidden="true">
         {
           RAPID_THUMBS.map((src, i) => (
-            <div
-              class="rapid-thumb"
-              style={`--i:${i}; --total:${RAPID_THUMBS.length}; --cycle:${RAPID_CYCLE_S}s; animation-delay:${(i * RAPID_SLOT).toFixed(3)}s;`}
-            >
+            <div class="rapid-thumb" data-index={i}>
               <img src={src} alt="" loading="lazy" />
             </div>
           ))
@@ -442,14 +439,12 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     transform: translateY(0.05em);
   }
 
-  /* ----- scene-rapid: Banas 3-5s rapid-fire ad showcase -----
-     Each .rapid-thumb is absolutely positioned in the center, then
-     becomes visible for one slot of the shared cycle. With N=16 thumbs
-     and 4s cycle, every thumb is on screen for 250ms.
-
-     The keyframe shows the thumb for ~6% of the cycle (≈ 240ms) and
-     hides it for the rest. animation-delay staggers each thumb by its
-     own slot so only one is visible at a time. */
+  /* ----- scene-rapid: scroll-driven flipbook of drama stills -----
+     Each .rapid-thumb is absolutely centered and starts hidden. The
+     script sets exactly ONE to display:block based on the current
+     scroll-progress slice within this scene. No CSS transitions or
+     animation — the swap must be instant, so the eye reads it as a
+     hard cut (matches the Banas 3-5s film-cut feel). */
   .scene-rapid {
     padding: 32px;
   }
@@ -465,31 +460,20 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     border-radius: 12px;
     overflow: hidden;
     background: #111;
-    opacity: 0;
-    transform: scale(1.05);
-    will-change: opacity, transform;
+    display: none;
     box-shadow:
       0 50px 100px -25px rgba(0, 0, 0, 0.85),
       0 20px 50px -15px rgba(0, 0, 0, 0.6),
       0 0 0 1px rgba(255, 255, 255, 0.06);
-    animation-name: rapid-flash;
-    animation-duration: var(--cycle, 4s);
-    animation-iteration-count: infinite;
-    animation-timing-function: steps(1, end);
+  }
+  .rapid-thumb.is-active {
+    display: block;
   }
   .rapid-thumb img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     display: block;
-  }
-  /* 1 / 16 of the cycle = 6.25% visible per thumb. Two stops so we
-     keep crisp on/off swaps (no fade) — feels like a rapid film cut. */
-  @keyframes rapid-flash {
-    0%, 100% { opacity: 0; transform: scale(1.05); }
-    0.01%   { opacity: 1; transform: scale(1); }
-    6.0%    { opacity: 1; transform: scale(1); }
-    6.01%   { opacity: 0; transform: scale(1.05); }
   }
   .rapid-caption {
     position: absolute;
@@ -505,14 +489,13 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
   }
 
-  /* Respect reduced motion — pause showcase on first thumb */
+  /* Respect reduced motion — keep first thumb visible only */
   @media (prefers-reduced-motion: reduce) {
     .rapid-thumb {
-      animation: none !important;
+      display: none;
     }
     .rapid-thumb:first-child {
-      opacity: 1;
-      transform: scale(1);
+      display: block;
     }
   }
 
@@ -1133,6 +1116,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       applyIntroLines(p);
       applySloganLines(p);
       applyPopThumbs(p);
+      applyRapidThumbs(p);
       if (mark) {
         // Drift -40px → +40px across full scroll, slight scale.
         const dy = (p - 0.5) * 80;
@@ -1158,6 +1142,46 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     });
   }
   applyIntroLines(0);
+
+  // ===== Rapid-fire showcase — scroll-driven flipbook =====
+  // Map the Rapid Showcase scene's scroll window onto N equal slices
+  // (one per thumb). Set exactly one thumb to .is-active per frame
+  // based on which slice we're in. Outside the scene window, no thumb
+  // is active (the scene's own opacity handles fade-in/out).
+  const rapidThumbs = Array.from(
+    document.querySelectorAll<HTMLElement>(".rapid-thumb"),
+  );
+  // Match the sceneSpecs entry for #sceneRapid above. We use the *hold*
+  // window so the flipbook plays only while the scene is at full
+  // opacity (the lead-in / lead-out are handled by the normal scene
+  // float-up motion).
+  const RAPID_START = 0.11;
+  const RAPID_END = 0.24;
+  let rapidActive = -1;
+
+  function applyRapidThumbs(p: number) {
+    if (rapidThumbs.length === 0) return;
+    if (p < RAPID_START || p > RAPID_END) {
+      if (rapidActive !== -1) {
+        // Outside the scene — clear the flag so re-entering animates fresh.
+        rapidThumbs.forEach((el) => el.classList.remove("is-active"));
+        rapidActive = -1;
+      }
+      return;
+    }
+    const local = (p - RAPID_START) / (RAPID_END - RAPID_START); // 0..1
+    const idx = Math.min(
+      rapidThumbs.length - 1,
+      Math.max(0, Math.floor(local * rapidThumbs.length)),
+    );
+    if (idx !== rapidActive) {
+      rapidThumbs[rapidActive]?.classList.remove("is-active");
+      rapidThumbs[idx]?.classList.add("is-active");
+      rapidActive = idx;
+    }
+  }
+  // Paint initial state: show first thumb if we're already past 0
+  applyRapidThumbs(0);
 
   // ===== Pop-thumb stagger entrance (Banas "バババっと" effect) =====
   // Two groups of thumbs land in two different scroll windows:
