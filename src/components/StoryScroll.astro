@@ -1,0 +1,682 @@
+---
+/**
+ * StoryScroll — Banas-style scroll-pinned 5-scene cross-fade.
+ *
+ * The LED background video is fixed-position behind everything. As the
+ * user scrolls through the 500vh `.story` container, a sticky `.stage`
+ * stays in view and a single ScrollTrigger.onUpdate computes per-frame
+ * opacity + scale for each scene so they REPLACE each other (instead of
+ * stacking). Lifted directly from /public/demo.html so the timing curve
+ * matches what the user already approved there.
+ *
+ * Display order: Brand → Featured → Numbers → On Air → Contact (5 scenes).
+ */
+import { hero, stats, projects } from "@/lib/site";
+
+// Featured project = first one in the projects array
+const featured = projects[0];
+---
+
+<!-- ===== Fixed LED background video (behind everything) ===== -->
+<div class="story-bg" aria-hidden="true">
+  {
+    hero.video && (
+      <video
+        poster={hero.videoPoster || undefined}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        class="story-bg-video"
+      >
+        <source src="/videos/yaja-led-bg.webm" type="video/webm" />
+        <source src={hero.video} type="video/mp4" />
+      </video>
+    )
+  }
+  <!-- Gentle dim so foreground text reads -->
+  <div class="story-bg-tint"></div>
+</div>
+
+<!-- ===== Fixed top-right scene counter (debug aid + UX cue) ===== -->
+<div class="scene-counter" id="scene-counter">
+  <span class="red">01</span> / 05 — Brand
+</div>
+
+<!-- ===== Story container — 500vh tall, holds the sticky stage ===== -->
+<div class="story" id="story">
+  <div class="stage">
+
+    <!-- Scene 1: Brand reveal -->
+    <section class="scene scene-1" id="scene1">
+      <p class="s1-eyebrow">
+        <span class="block-line"></span>
+        K-Short Drama Studio · Est. 2024
+        <span class="block-line"></span>
+      </p>
+      <div class="s1-yaja">
+        <span>Y</span><span>A</span><span>J</span><span>A</span>
+        <img src="/logos/fire-symbol/red-symbol.png" alt="" class="s1-flame" />
+      </div>
+      <p class="s1-sub">
+        대한민국 <span class="red">No.1</span> 숏폼 드라마 스튜디오
+      </p>
+    </section>
+
+    <!-- Scene 2: Featured Campaign -->
+    <section class="scene scene-2" id="scene2">
+      <div class="s2-card">
+        {
+          featured?.video && (
+            <video
+              src={featured.video}
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            />
+          )
+        }
+      </div>
+      <div class="s2-meta">
+        <p class="s2-eyebrow">— Featured Campaign</p>
+        <p class="s2-brand">{featured?.brand ?? "VASELINE"}</p>
+        <p class="s2-num">
+          {featured?.metric?.value ?? "12,342,129"}{" "}
+          <span class="s2-unit">{featured?.metric?.unit ?? "회"}</span> ·{" "}
+          {featured?.type ?? "Branded Contents"}
+        </p>
+      </div>
+    </section>
+
+    <!-- Scene 3: Big Numbers (animated count-up) -->
+    <section class="scene scene-3" id="scene3">
+      <div class="s3-grid">
+        {
+          stats.slice(0, 3).map((s) => (
+            <div class="s3-stat">
+              <div class="s3-val">
+                <span class="num" data-target={s.numeric}>0</span>
+                <span class="u">{s.unit}</span>
+              </div>
+              <div class="s3-label">{s.label}</div>
+            </div>
+          ))
+        }
+      </div>
+      <p class="s3-tag">★ TikTok Awards 2024 — Video of The Year</p>
+    </section>
+
+    <!-- Scene 4: ON AIR Lineup -->
+    <section class="scene scene-4" id="scene4">
+      <p class="s4-eyebrow">On Air · 2026 Week 21</p>
+      <div class="s4-cards">
+        <div class="s4-card">
+          <img src="/screens/yajacamp-ig.png" alt="" />
+          <span class="badge">On Air</span>
+          <div class="name">
+            YAJA POP<span class="ko">야자팝 · 친자검사 #4</span>
+          </div>
+        </div>
+        <div class="s4-card">
+          <img src="/screens/yajacamp-header.png" alt="" />
+          <span class="badge">On Air</span>
+          <div class="name">
+            YAJA CAMP<span class="ko">야자캠프 · K-Short Drama</span>
+          </div>
+        </div>
+        <div class="s4-card">
+          <img src="/screens/ycn-tiktok.png" alt="" />
+          <span class="badge">On Air</span>
+          <div class="name">
+            YCN<span class="ko">영찍남 · YCN Strange Man</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Final CTA -->
+    <section class="scene scene-5" id="scene5">
+      <h2 class="s5-title">
+        함께<br />
+        <span class="red">새로운 IP</span>를<br />
+        만들어 봅시다.
+      </h2>
+      <p class="s5-sub">
+        캠페인 문의 · 채용 · 미디어 협업 — info@yajacamp.com
+      </p>
+      <div class="s5-actions">
+        <a href="mailto:info@yajacamp.com" class="s5-cta">Contact YAJA →</a>
+        <a href="#works" class="s5-cta ghost">전체 작품 보기</a>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ===== Bottom progress bar ===== -->
+<div class="progress" id="story-progress"></div>
+
+<style is:global>
+  /* ===== Fixed LED background video — always behind everything ===== */
+  .story-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .story-bg-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.75;
+  }
+  .story-bg-tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(30, 30, 30, 0.45) 0%,
+      rgba(30, 30, 30, 0.18) 38%,
+      rgba(30, 30, 30, 0.55) 100%
+    );
+  }
+
+  /* ===== Scene counter ===== */
+  .scene-counter {
+    position: fixed;
+    top: 80px;
+    right: 24px;
+    z-index: 50;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c8cdd7;
+    backdrop-filter: blur(8px);
+  }
+  .scene-counter .red {
+    color: var(--color-yaja-red);
+  }
+
+  /* ===== Story container & sticky stage ===== */
+  .story {
+    position: relative;
+    height: 500vh; /* 5 scenes × 100vh */
+    z-index: 2;
+  }
+  .story .stage {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+  }
+  .story .scene {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 32px;
+    opacity: 0;
+    will-change: opacity, transform;
+  }
+
+  /* ----- Scene 1: Brand ----- */
+  .s1-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-yaja-red);
+    margin-bottom: 32px;
+  }
+  .s1-eyebrow .block-line {
+    display: block;
+    width: 32px;
+    height: 1px;
+    background: var(--color-yaja-red);
+  }
+  .s1-yaja {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    font-family: var(--font-num);
+    font-weight: 900;
+    letter-spacing: -0.05em;
+    line-height: 0.85;
+    color: #fff;
+    font-size: clamp(96px, 17vw, 240px);
+  }
+  .s1-flame {
+    width: clamp(50px, 9vw, 130px);
+    height: auto;
+    margin-left: 12px;
+    align-self: center;
+    filter: drop-shadow(0 0 24px rgba(255, 72, 72, 0.55));
+  }
+  .s1-sub {
+    margin-top: 36px;
+    font-size: clamp(18px, 2.2vw, 32px);
+    font-weight: 700;
+    color: #fff;
+  }
+  .s1-sub .red {
+    color: var(--color-yaja-red);
+  }
+
+  /* ----- Scene 2: Featured Campaign ----- */
+  .scene-2 {
+    flex-direction: row !important;
+    gap: 48px;
+    padding: 32px 6vw;
+  }
+  .s2-card {
+    width: clamp(220px, 26vw, 340px);
+    aspect-ratio: 9 / 16;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    flex-shrink: 0;
+  }
+  .s2-card video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .s2-meta {
+    text-align: left;
+  }
+  .s2-eyebrow {
+    font-family: var(--font-num);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-yaja-red);
+    margin-bottom: 16px;
+  }
+  .s2-brand {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(48px, 7vw, 96px);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: #fff;
+  }
+  .s2-num {
+    margin-top: 16px;
+    font-family: var(--font-num);
+    font-size: clamp(14px, 1.4vw, 18px);
+    color: #c8cdd7;
+    letter-spacing: 0.05em;
+  }
+  .s2-unit {
+    color: #9ca3af;
+  }
+  @media (max-width: 768px) {
+    .scene-2 {
+      flex-direction: column !important;
+      gap: 24px;
+    }
+    .s2-meta {
+      text-align: center;
+    }
+  }
+
+  /* ----- Scene 3: Numbers ----- */
+  .s3-grid {
+    display: flex;
+    gap: clamp(32px, 8vw, 96px);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .s3-stat {
+    text-align: center;
+  }
+  .s3-val {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(72px, 10vw, 160px);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: #fff;
+  }
+  .s3-val .u {
+    font-size: 0.4em;
+    color: #9ca3af;
+    margin-left: 8px;
+  }
+  .s3-label {
+    margin-top: 16px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c8cdd7;
+  }
+  .s3-tag {
+    margin-top: 64px;
+    font-family: var(--font-num);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-yaja-red);
+  }
+
+  /* ----- Scene 4: On Air ----- */
+  .s4-eyebrow {
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--color-yaja-red);
+    margin-bottom: 48px;
+  }
+  .s4-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    max-width: 1100px;
+    width: 100%;
+  }
+  .s4-card {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .s4-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .s4-card .badge {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    background: var(--color-yaja-red);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-family: var(--font-num);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .s4-card .name {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    font-family: var(--font-num);
+    font-weight: 800;
+    font-size: clamp(16px, 1.4vw, 20px);
+    color: #fff;
+    text-align: left;
+  }
+  .s4-card .name .ko {
+    display: block;
+    margin-top: 4px;
+    font-family: var(--font-kr);
+    font-size: 12px;
+    font-weight: 500;
+    color: #c8cdd7;
+    letter-spacing: 0;
+  }
+  @media (max-width: 768px) {
+    .s4-cards {
+      grid-template-columns: 1fr;
+      max-width: 320px;
+    }
+  }
+
+  /* ----- Scene 5: CTA ----- */
+  .s5-title {
+    font-family: var(--font-num);
+    font-size: clamp(56px, 9vw, 160px);
+    font-weight: 900;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
+    color: #fff;
+    max-width: 14ch;
+  }
+  .s5-title .red {
+    color: var(--color-yaja-red);
+  }
+  .s5-sub {
+    margin-top: 36px;
+    font-size: clamp(16px, 1.5vw, 22px);
+    color: #c8cdd7;
+    font-weight: 500;
+  }
+  .s5-actions {
+    margin-top: 56px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .s5-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 22px 40px;
+    background: var(--color-yaja-red);
+    color: #fff;
+    font-family: var(--font-num);
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: transform 0.2s;
+  }
+  .s5-cta:hover {
+    transform: translateY(-2px);
+  }
+  .s5-cta.ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* ----- Progress bar ----- */
+  .story #story-progress,
+  .progress {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--color-yaja-red);
+    z-index: 60;
+    transition: width 0.08s linear;
+  }
+</style>
+
+<script>
+  import gsap from "gsap";
+  import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  // ===== Scene cross-fade — same logic as /public/demo.html =====
+  // 5 scenes share one ScrollTrigger; per-frame opacity+scale are
+  // computed from a single scroll-progress value so transitions
+  // properly REPLACE each scene (no stacking).
+
+  interface SceneSpec {
+    sel: string;
+    label: string;
+    fadeIn: number;
+    holdStart: number;
+    holdEnd: number;
+    fadeOut: number;
+    el?: HTMLElement | null;
+  }
+
+  const sceneSpecs: SceneSpec[] = [
+    // 01 Brand — visible at start, hands off at 0.18
+    {
+      sel: "#scene1",
+      label: "01 / 05 — Brand",
+      fadeIn: -Infinity,
+      holdStart: 0,
+      holdEnd: 0.1,
+      fadeOut: 0.18,
+    },
+    // 02 Featured Campaign
+    {
+      sel: "#scene2",
+      label: "02 / 05 — Featured",
+      fadeIn: 0.2,
+      holdStart: 0.25,
+      holdEnd: 0.35,
+      fadeOut: 0.43,
+    },
+    // 03 Numbers
+    {
+      sel: "#scene3",
+      label: "03 / 05 — Numbers",
+      fadeIn: 0.45,
+      holdStart: 0.5,
+      holdEnd: 0.6,
+      fadeOut: 0.68,
+    },
+    // 04 On Air
+    {
+      sel: "#scene4",
+      label: "04 / 05 — On Air",
+      fadeIn: 0.7,
+      holdStart: 0.75,
+      holdEnd: 0.85,
+      fadeOut: 0.93,
+    },
+    // 05 Contact (sticks to end)
+    {
+      sel: "#scene5",
+      label: "05 / 05 — Contact",
+      fadeIn: 0.93,
+      holdStart: 0.98,
+      holdEnd: Infinity,
+      fadeOut: Infinity,
+    },
+  ];
+
+  // Cache element refs
+  sceneSpecs.forEach((s) => {
+    s.el = document.querySelector<HTMLElement>(s.sel);
+  });
+
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+  const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
+
+  function computeSceneState(p: number, s: SceneSpec) {
+    if (p < s.fadeIn) return { opacity: 0, scale: 1.25 };
+    if (p < s.holdStart) {
+      const t = clamp01((p - s.fadeIn) / (s.holdStart - s.fadeIn));
+      return { opacity: t, scale: lerp(1.25, 1, t) };
+    }
+    if (p <= s.holdEnd) return { opacity: 1, scale: 1 };
+    if (p <= s.fadeOut) {
+      const t = clamp01((p - s.holdEnd) / (s.fadeOut - s.holdEnd));
+      return { opacity: 1 - t, scale: lerp(1, 0.85, t) };
+    }
+    return { opacity: 0, scale: 0.85 };
+  }
+
+  // Initial paint: scene 1 visible, rest hidden + scaled up
+  sceneSpecs.forEach((s, i) => {
+    if (!s.el) return;
+    gsap.set(s.el, i === 0 ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 1.25 });
+  });
+
+  ScrollTrigger.create({
+    trigger: ".story",
+    start: "top top",
+    end: "bottom bottom",
+    scrub: true,
+    onUpdate: (self) => {
+      const p = self.progress;
+      sceneSpecs.forEach((s) => {
+        if (!s.el) return;
+        const { opacity, scale } = computeSceneState(p, s);
+        s.el.style.opacity = String(opacity);
+        s.el.style.transform = `scale(${scale})`;
+      });
+    },
+  });
+
+  // ===== Number count-up — fires when Numbers scene fades in =====
+  const nums = document.querySelectorAll<HTMLElement>(".scene-3 .num");
+  const NUM_FIRE = 0.47; // a touch after fadeIn at 0.45
+  const NUM_RESET = 0.43;
+  let numsTriggered = false;
+  ScrollTrigger.create({
+    trigger: ".story",
+    start: "top top",
+    end: "bottom bottom",
+    onUpdate: (self) => {
+      if (self.progress >= NUM_FIRE && !numsTriggered) {
+        numsTriggered = true;
+        nums.forEach((el) => {
+          const target = parseInt(el.dataset.target ?? "0", 10);
+          const obj = { v: 0 };
+          gsap.to(obj, {
+            v: target,
+            duration: 1.4,
+            ease: "power2.out",
+            onUpdate: () => (el.textContent = String(Math.round(obj.v))),
+          });
+        });
+      }
+      if (self.progress < NUM_RESET) {
+        numsTriggered = false;
+        nums.forEach((el) => (el.textContent = "0"));
+      }
+    },
+  });
+
+  // ===== Progress bar + scene counter =====
+  const counter = document.getElementById("scene-counter");
+  const progress = document.getElementById("story-progress");
+  ScrollTrigger.create({
+    trigger: ".story",
+    start: "top top",
+    end: "bottom bottom",
+    onUpdate: (self) => {
+      if (progress) progress.style.width = `${(self.progress * 100).toFixed(1)}%`;
+      let active = sceneSpecs[0];
+      for (const s of sceneSpecs) {
+        if (self.progress >= s.holdStart) active = s;
+      }
+      if (counter) {
+        const [num, ...rest] = active.label.split(" ");
+        counter.innerHTML = `<span class="red">${num}</span> ${rest.join(" ")}`;
+      }
+    },
+  });
+</script>

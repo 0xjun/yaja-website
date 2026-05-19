@@ -1,46 +1,31 @@
 ---
 /**
- * Home page — mirrors oasiz.org section flow.
+ * Home page — Banas-style scroll-pinned 5-scene story.
  *
- * 1. Hero            — center column with logo letters
- * 2. Stats           — two prominent numbers (OASIZ §2)
- * 3. Strategy        — mission with × separator (OASIZ §3)
- * 4. Categories      — 5 ★ bilingual rows (OASIZ §4)
- * 5. Projects        — 4 case-study cards (OASIZ §5)
- * 6. Clients         — 3×3 static grid (OASIZ §7)
- * 7. Partnership     — TikTok Awards banner (OASIZ §8)
- * 8. Column          — featured article (OASIZ §9)
- * 9. News            — latest 3 news rows (OASIZ §10)
- * 10. Contact        — closing CTA
+ * The LED-screen background loop stays pinned behind everything while
+ * the user scrolls; five scenes cross-fade in/out as scroll progress
+ * advances:
+ *
+ *   01 Brand → 02 Featured Campaign → 03 Numbers
+ *      → 04 On Air → 05 Contact CTA
+ *
+ * All five scenes (plus the fixed bg video, scene counter, and progress
+ * bar) live inside `<StoryScroll />`. Other component sections
+ * (Strategy / Categories / Clients / Partnership / Column / News) are
+ * intentionally not rendered here — they'll move to dedicated routes
+ * (/about, /works, /column, /news) so the homepage stays a single
+ * cinematic scroll.
  */
 import Layout from "@/layouts/Layout.astro";
 import Header from "@/components/Header.astro";
 import Footer from "@/components/Footer.astro";
-import Hero from "@/components/sections/Hero.astro";
-import Stats from "@/components/sections/Stats.astro";
-import Strategy from "@/components/sections/Strategy.astro";
-import Categories from "@/components/sections/Categories.astro";
-import Projects from "@/components/sections/Projects.astro";
-import Clients from "@/components/sections/Clients.astro";
-import Partnership from "@/components/sections/Partnership.astro";
-import Column from "@/components/sections/Column.astro";
-import News from "@/components/sections/News.astro";
-import Contact from "@/components/sections/Contact.astro";
+import StoryScroll from "@/components/StoryScroll.astro";
 ---
 
 <Layout>
   <Header />
   <main>
-    <Hero />
-    <Stats />
-    <Strategy />
-    <Categories />
-    <Projects />
-    <Clients />
-    <Partnership />
-    <Column />
-    <News />
-    <Contact />
+    <StoryScroll />
   </main>
   <Footer />
 </Layout>
