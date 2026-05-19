@@ -1,20 +1,27 @@
 ---
 /**
- * StoryScroll — Banas-style scroll-pinned 5-scene cross-fade.
+ * StoryScroll — YAJA's port of the Banas reference video, rebuilt
+ * 1:1 in a scroll-pinned cinematic.
  *
- * The LED background video is fixed-position behind everything. As the
- * user scrolls through the 500vh `.story` container, a sticky `.stage`
- * stays in view and a single ScrollTrigger.onUpdate computes per-frame
- * opacity + scale for each scene so they REPLACE each other (instead of
- * stacking). Lifted directly from /public/demo.html so the timing curve
- * matches what the user already approved there.
+ * Eight scenes cross-fade above a fixed LED-screen background loop
+ * (the Higgsfield-generated reflection video). A massive blurred
+ * "YAJA" wordmark sits behind every scene — that's the move Banas
+ * leans on to give the whole video a single brand signature.
  *
- * Display order: Brand → Featured → Numbers → On Air → Contact (5 scenes).
+ *   01 Intro tagline       — beyond time, beyond space, …
+ *   02 Project showcase 1  — Vaseline campaign card
+ *   03 Service highlight   — fake YAJA dashboard card (Banas UI moment)
+ *   04 Project showcase 2  — Samsung campaign card
+ *   05 Three-step process  — Concept. Create. Distribute. + grid
+ *   06 Big numbers stats   — 19억 / 682만 / 183만
+ *   07 Positioning slogan  — No script. No actor. No limits.
+ *   08 Final logo + CTA    — YAJA™ Start a project
  */
 import { hero, stats, projects } from "@/lib/site";
 
-// Featured project = first one in the projects array
-const featured = projects[0];
+const proj1 = projects[0]; // Vaseline
+const proj2 = projects[1]; // Samsung
+const gridProjects = projects.slice(0, 4);
 ---
 
 <!-- ===== Fixed LED background video (behind everything) ===== -->
@@ -39,12 +46,20 @@ const featured = projects[0];
   <div class="story-bg-tint"></div>
 </div>
 
-<!-- ===== Fixed top-right scene counter (debug aid + UX cue) ===== -->
-<div class="scene-counter" id="scene-counter">
-  <span class="red">01</span> / 06 — Intro
+<!-- ===== Huge blurred YAJA wordmark — Banas signature move.
+     Sits BEHIND scene content but IN FRONT of the LED bg, so the
+     LED glows through the letters. Slowly drifts with scroll for
+     parallax depth. ===== -->
+<div class="story-mark" aria-hidden="true">
+  <span class="story-mark-text">YAJA</span>
 </div>
 
-<!-- ===== Story container — 600vh tall, holds the sticky stage ===== -->
+<!-- ===== Top-right scene counter ===== -->
+<div class="scene-counter" id="scene-counter">
+  <span class="red">01</span> / 08 — Intro
+</div>
+
+<!-- ===== Story container — 800vh tall, holds the sticky stage ===== -->
 <div class="story" id="story">
   <div class="stage">
 
@@ -57,29 +72,13 @@ const featured = projects[0];
       </p>
     </section>
 
-    <!-- Scene 1: Brand reveal -->
-    <section class="scene scene-1" id="scene1">
-      <p class="s1-eyebrow">
-        <span class="block-line"></span>
-        K-Short Drama Studio · Est. 2024
-        <span class="block-line"></span>
-      </p>
-      <div class="s1-yaja">
-        <span>Y</span><span>A</span><span>J</span><span>A</span>
-        <img src="/logos/fire-symbol/red-symbol.png" alt="" class="s1-flame" />
-      </div>
-      <p class="s1-sub">
-        대한민국 <span class="red">No.1</span> 숏폼 드라마 스튜디오
-      </p>
-    </section>
-
-    <!-- Scene 2: Featured Campaign -->
-    <section class="scene scene-2" id="scene2">
-      <div class="s2-card">
+    <!-- Scene 1: Project showcase 1 — Vaseline (Banas "OUT OF THE BOX" moment) -->
+    <section class="scene scene-ad" id="scene1">
+      <div class="ad-card">
         {
-          featured?.video && (
+          proj1?.video && (
             <video
-              src={featured.video}
+              src={proj1.video}
               autoplay
               muted
               loop
@@ -88,77 +87,190 @@ const featured = projects[0];
             />
           )
         }
-      </div>
-      <div class="s2-meta">
-        <p class="s2-eyebrow">— Featured Campaign</p>
-        <p class="s2-brand">{featured?.brand ?? "VASELINE"}</p>
-        <p class="s2-num">
-          {featured?.metric?.value ?? "12,342,129"}{" "}
-          <span class="s2-unit">{featured?.metric?.unit ?? "회"}</span> ·{" "}
-          {featured?.type ?? "Branded Contents"}
-        </p>
+        <div class="ad-meta">
+          <h2 class="ad-title">CARE EVERY DAY.</h2>
+          <p class="ad-body">
+            일상 속 케어 스토리를 숏폼 드라마로.<br />
+            단일 PR <strong>12,342,129회</strong> 조회.
+          </p>
+          <div class="ad-footer">
+            <span class="ad-badge">Branded Series</span>
+            <span class="ad-brand">{proj1?.brand ?? "Vaseline"} × YAJA</span>
+          </div>
+        </div>
       </div>
     </section>
 
-    <!-- Scene 3: Big Numbers (animated count-up) -->
-    <section class="scene scene-3" id="scene3">
-      <div class="s3-grid">
+    <!-- Scene 2: Service highlight modal — Banas "AI-generated banners" moment -->
+    <section class="scene scene-modal" id="scene2">
+      <div class="modal-card">
+        <div class="modal-head">
+          <span class="modal-label">★ PROMPT</span>
+          <span class="modal-action">Generate →</span>
+        </div>
+        <p class="modal-input">
+          Branded short-form drama for every platform, every audience.
+        </p>
+        <div class="modal-progress">
+          <span class="bar"><span class="fill"></span></span>
+          <span class="modal-meta">YAJA · K-Short Drama</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 3: Project showcase 2 — Samsung (Banas "FILL EVERY FRAME" moment) -->
+    <section class="scene scene-ad" id="scene3">
+      <div class="ad-card vertical">
         {
-          stats.slice(0, 3).map((s) => (
-            <div class="s3-stat">
-              <div class="s3-val">
+          proj2?.video && (
+            <video
+              src={proj2.video}
+              autoplay
+              muted
+              loop
+              playsinline
+              preload="metadata"
+            />
+          )
+        }
+        <div class="ad-meta">
+          <h2 class="ad-title">FILL EVERY EPISODE.</h2>
+          <p class="ad-body">
+            인기 드라마 시리즈 안에서 자연스러운 제품 노출.<br />
+            2 에피소드로 <strong>4,544,123회</strong> 조회.
+          </p>
+          <div class="ad-footer">
+            <span class="ad-badge">Drama PPL</span>
+            <span class="ad-brand">{proj2?.brand ?? "SAMSUNG"} × YAJA</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 4: 3-step process — Banas "Type. Generate. Ship." moment -->
+    <section class="scene scene-steps" id="scene4">
+      <div class="steps-grid">
+        <div class="steps-left">
+          <p class="steps-eyebrow">— How we work</p>
+          <ol class="steps-list">
+            <li class="step">
+              <span class="step-num">01.</span>
+              <span class="step-name">Concept.</span>
+            </li>
+            <li class="step">
+              <span class="step-num">02.</span>
+              <span class="step-name">Create.</span>
+            </li>
+            <li class="step">
+              <span class="step-num">03.</span>
+              <span class="step-name">Distribute.</span>
+            </li>
+          </ol>
+          <p class="steps-foot">
+            기획에서 송출까지, YAJA 한 곳에서.
+          </p>
+        </div>
+        <div class="steps-right">
+          {
+            gridProjects.map((p) => (
+              <div class="thumb">
+                {p.video && (
+                  <video
+                    src={p.video}
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="metadata"
+                  />
+                )}
+                <span class="thumb-tag">{p.brand}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Scene 5: Big numbers stats — Banas "10s 81x $0" moment -->
+    <section class="scene scene-stats" id="scene5">
+      <div class="stats-row">
+        {
+          stats.slice(0, 3).map((s, i) => (
+            <div class="stat-cell">
+              <div class="stat-val">
                 <span class="num" data-target={s.numeric}>0</span>
                 <span class="u">{s.unit}</span>
               </div>
-              <div class="s3-label">{s.label}</div>
+              <div class="stat-label">
+                {i === 0 && "Total Views"}
+                {i === 1 && "Followers"}
+                {i === 2 && "Avg / Episode"}
+              </div>
             </div>
           ))
         }
       </div>
-      <p class="s3-tag">★ TikTok Awards 2024 — Video of The Year</p>
+      <p class="stats-tag">★ TikTok Awards 2024 — Video of The Year</p>
     </section>
 
-    <!-- Scene 4: ON AIR Lineup -->
-    <section class="scene scene-4" id="scene4">
-      <p class="s4-eyebrow">On Air · 2026 Week 21</p>
-      <div class="s4-cards">
-        <div class="s4-card">
-          <img src="/screens/yajacamp-ig.png" alt="" />
-          <span class="badge">On Air</span>
-          <div class="name">
-            YAJA POP<span class="ko">야자팝 · 친자검사 #4</span>
-          </div>
-        </div>
-        <div class="s4-card">
-          <img src="/screens/yajacamp-header.png" alt="" />
-          <span class="badge">On Air</span>
-          <div class="name">
-            YAJA CAMP<span class="ko">야자캠프 · K-Short Drama</span>
-          </div>
-        </div>
-        <div class="s4-card">
-          <img src="/screens/ycn-tiktok.png" alt="" />
-          <span class="badge">On Air</span>
-          <div class="name">
-            YCN<span class="ko">영찍남 · YCN Strange Man</span>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Scene 5: Final CTA -->
-    <section class="scene scene-5" id="scene5">
-      <h2 class="s5-title">
-        함께<br />
-        <span class="red">새로운 IP</span>를<br />
-        만들어 봅시다.
-      </h2>
-      <p class="s5-sub">
-        캠페인 문의 · 채용 · 미디어 협업 — info@yajacamp.com
+    <!-- Scene 6: Positioning slogan — Banas "No designer / needed" moment -->
+    <section class="scene scene-slogan" id="scene6">
+      <p class="slogan">
+        <span class="line" data-line="1">No script.</span>
+        <span class="line" data-line="2">No actor.</span>
+        <span class="line" data-line="3">No limits.</span>
       </p>
-      <div class="s5-actions">
-        <a href="mailto:info@yajacamp.com" class="s5-cta">Contact YAJA →</a>
-        <a href="#works" class="s5-cta ghost">전체 작품 보기</a>
+      <p class="slogan-sub">
+        YAJA가 자체 IP, 자체 배우, 자체 스튜디오로 모든 단계를 책임집니다.
+      </p>
+    </section>
+
+    <!-- Scene 7: Final logo + CTA — Banas "Banas™ Start for free" moment -->
+    <section class="scene scene-final" id="scene7">
+      <!-- Project grid bg, behind the centered YAJA lockup -->
+      <div class="final-grid">
+        {
+          gridProjects.map((p) => (
+            <div class="final-thumb">
+              {p.video && (
+                <video
+                  src={p.video}
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                />
+              )}
+            </div>
+          ))
+        }
+        {
+          gridProjects.map((p) => (
+            <div class="final-thumb">
+              {p.video && (
+                <video
+                  src={p.video}
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                />
+              )}
+            </div>
+          ))
+        }
+      </div>
+
+      <div class="final-center">
+        <div class="final-lockup">
+          <img src="/logos/fire-symbol/red-symbol.png" alt="" class="final-flame" />
+          <span class="final-wordmark">YAJA<span class="tm">™</span></span>
+        </div>
+        <a href="mailto:info@yajacamp.com" class="final-cta">Start a project</a>
+        <p class="final-foot">yajacamp.com</p>
       </div>
     </section>
 
@@ -190,20 +302,44 @@ const featured = projects[0];
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(30, 30, 30, 0.45) 0%,
-      rgba(30, 30, 30, 0.18) 38%,
-      rgba(30, 30, 30, 0.55) 100%
+      rgba(30, 30, 30, 0.55) 0%,
+      rgba(30, 30, 30, 0.25) 38%,
+      rgba(30, 30, 30, 0.7) 100%
     );
   }
 
-  /* ===== Scene counter ===== */
+  /* ===== Huge blurred YAJA wordmark — Banas-style signature bg ===== */
+  .story-mark {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .story-mark-text {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: 48vw;
+    letter-spacing: -0.08em;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.06);
+    filter: blur(28px);
+    transform: scaleY(0.85);
+    white-space: nowrap;
+    will-change: transform;
+  }
+
+  /* ===== Scene counter (top-right pill) ===== */
   .scene-counter {
     position: fixed;
     top: 80px;
     right: 24px;
     z-index: 50;
     padding: 8px 16px;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.55);
     border: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 999px;
     font-family: var(--font-num);
@@ -221,7 +357,7 @@ const featured = projects[0];
   /* ===== Story container & sticky stage ===== */
   .story {
     position: relative;
-    height: 600vh; /* 6 scenes × 100vh (Intro + 5 content scenes) */
+    height: 800vh; /* 8 scenes × 100vh */
     z-index: 2;
   }
   .story .stage {
@@ -252,37 +388,194 @@ const featured = projects[0];
     gap: 4px;
     font-family: var(--font-num);
     font-weight: 900;
-    font-size: clamp(28px, 4.4vw, 72px);
+    font-size: clamp(32px, 5vw, 84px);
     letter-spacing: -0.025em;
     line-height: 1.05;
     color: #fff;
-    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
   }
   .s0-tagline .line {
     opacity: 0;
     transform: translate3d(0, 24px, 0);
     will-change: opacity, transform;
-    /* The script flips these to (1, 0px) at the right scroll moment. */
-  }
-  .s0-tagline .line:last-child {
-    color: #fff;
   }
   .s0-tagline .line:last-child::after {
     content: "";
     display: inline-block;
-    width: 0.18em;
-    height: 0.9em;
-    margin-left: 0.12em;
+    width: 0.16em;
+    height: 0.85em;
+    margin-left: 0.14em;
     background: var(--color-yaja-red);
     vertical-align: -0.05em;
     transform: translateY(0.05em);
   }
 
-  /* ----- Scene 1: Brand ----- */
-  .s1-eyebrow {
+  /* ----- scene-ad: Banas "single floating ad" moment ----- */
+  .scene-ad {
+    padding: 32px 5vw;
+  }
+  .ad-card {
+    position: relative;
+    width: min(540px, 80vw);
+    aspect-ratio: 9 / 14;
+    background: #0a0a0a;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 60px 120px -20px rgba(0, 0, 0, 0.85),
+      0 30px 60px -15px rgba(0, 0, 0, 0.6),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+  .ad-card video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.55;
+  }
+  .ad-meta {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 36px 32px 32px;
+    background: linear-gradient(
+      180deg,
+      transparent 40%,
+      rgba(0, 0, 0, 0.85) 100%
+    );
+    text-align: left;
+  }
+  .ad-title {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(32px, 4.5vw, 60px);
+    line-height: 0.96;
+    letter-spacing: -0.035em;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+  .ad-body {
+    font-size: 13px;
+    line-height: 1.55;
+    color: #c8cdd7;
+    margin-bottom: 24px;
+  }
+  .ad-body strong {
+    color: #fff;
+    font-weight: 700;
+  }
+  .ad-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ad-badge {
     display: inline-flex;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--color-yaja-red);
+    color: #fff;
+    font-family: var(--font-num);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    border-radius: 4px;
+  }
+  .ad-brand {
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #9ca3af;
+  }
+
+  /* ----- scene-modal: Banas UI card moment ----- */
+  .modal-card {
+    width: min(640px, 88vw);
+    padding: 22px 24px 20px;
+    background: rgba(245, 245, 247, 0.96);
+    color: #1e1e1e;
+    border-radius: 14px;
+    box-shadow:
+      0 60px 120px -20px rgba(0, 0, 0, 0.85),
+      0 24px 60px -15px rgba(0, 0, 0, 0.5);
+    text-align: left;
+  }
+  .modal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    font-family: var(--font-num);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+  .modal-label {
+    color: var(--color-yaja-red);
+  }
+  .modal-action {
+    color: #6e7380;
+  }
+  .modal-input {
+    font-size: clamp(14px, 1.3vw, 17px);
+    color: #1e1e1e;
+    font-weight: 500;
+    line-height: 1.4;
+    margin-bottom: 16px;
+  }
+  .modal-progress {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .modal-progress .bar {
+    flex: 1;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .modal-progress .fill {
+    display: block;
+    width: 64%;
+    height: 100%;
+    background: linear-gradient(90deg, #1e1e1e 0%, #6e7380 100%);
+  }
+  .modal-meta {
+    font-family: var(--font-num);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6e7380;
+  }
+
+  /* ----- scene-steps: Banas 3-step + poster grid ----- */
+  .scene-steps {
+    padding: 32px 4vw;
+  }
+  .steps-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 6vw;
+    width: 100%;
+    max-width: 1280px;
+    align-items: center;
+  }
+  .steps-left {
+    text-align: left;
+  }
+  .steps-eyebrow {
     font-family: var(--font-num);
     font-size: 11px;
     font-weight: 700;
@@ -291,259 +584,247 @@ const featured = projects[0];
     color: var(--color-yaja-red);
     margin-bottom: 32px;
   }
-  .s1-eyebrow .block-line {
-    display: block;
-    width: 32px;
-    height: 1px;
-    background: var(--color-yaja-red);
+  .steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
   }
-  .s1-yaja {
+  .step {
     display: flex;
     align-items: baseline;
+    gap: 16px;
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(40px, 6vw, 96px);
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+    color: #fff;
+  }
+  .step-num {
+    font-size: 0.32em;
+    color: #6e7380;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+  .steps-foot {
+    margin-top: 36px;
+    max-width: 32ch;
+    font-size: 14px;
+    color: #c8cdd7;
+    line-height: 1.6;
+  }
+  .steps-right {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 540px;
+  }
+  .thumb {
+    position: relative;
+    aspect-ratio: 9 / 14;
+    background: #111;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .thumb video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.85;
+  }
+  .thumb-tag {
+    position: absolute;
+    bottom: 10px;
+    left: 12px;
+    font-family: var(--font-num);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.7);
+  }
+  @media (max-width: 900px) {
+    .steps-grid {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .steps-right {
+      grid-template-columns: repeat(2, 1fr);
+      max-width: 360px;
+      margin: 0 auto;
+    }
+  }
+
+  /* ----- scene-stats: big numbers ----- */
+  .stats-row {
+    display: flex;
+    gap: clamp(36px, 8vw, 120px);
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .stat-cell {
+    text-align: center;
+  }
+  .stat-val {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(72px, 11vw, 180px);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    color: #fff;
+  }
+  .stat-val .u {
+    font-size: 0.32em;
+    color: #9ca3af;
+    margin-left: 8px;
+    font-weight: 700;
+  }
+  .stat-label {
+    margin-top: 16px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #c8cdd7;
+  }
+  .stats-tag {
+    margin-top: 64px;
+    font-family: var(--font-num);
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--color-yaja-red);
+  }
+
+  /* ----- scene-slogan: Banas "No designer needed" moment ----- */
+  .slogan {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     gap: 4px;
     font-family: var(--font-num);
     font-weight: 900;
-    letter-spacing: -0.05em;
-    line-height: 0.85;
+    font-size: clamp(48px, 9vw, 156px);
+    letter-spacing: -0.045em;
+    line-height: 0.96;
     color: #fff;
-    font-size: clamp(96px, 17vw, 240px);
-  }
-  .s1-flame {
-    width: clamp(50px, 9vw, 130px);
-    height: auto;
-    margin-left: 12px;
-    align-self: center;
-    filter: drop-shadow(0 0 24px rgba(255, 72, 72, 0.55));
-  }
-  .s1-sub {
-    margin-top: 36px;
-    font-size: clamp(18px, 2.2vw, 32px);
-    font-weight: 700;
-    color: #fff;
-  }
-  .s1-sub .red {
-    color: var(--color-yaja-red);
-  }
-
-  /* ----- Scene 2: Featured Campaign ----- */
-  .scene-2 {
-    flex-direction: row !important;
-    gap: 48px;
-    padding: 32px 6vw;
-  }
-  .s2-card {
-    width: clamp(220px, 26vw, 340px);
-    aspect-ratio: 9 / 16;
-    border-radius: 8px;
-    overflow: hidden;
-    background: #111;
-    flex-shrink: 0;
-  }
-  .s2-card video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .s2-meta {
     text-align: left;
   }
-  .s2-eyebrow {
-    font-family: var(--font-num);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+  .slogan .line {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+    will-change: opacity, transform;
+  }
+  .slogan .line:last-child {
     color: var(--color-yaja-red);
-    margin-bottom: 16px;
   }
-  .s2-brand {
-    font-family: var(--font-num);
-    font-weight: 900;
-    font-size: clamp(48px, 7vw, 96px);
-    letter-spacing: -0.04em;
-    line-height: 1;
-    color: #fff;
-  }
-  .s2-num {
-    margin-top: 16px;
-    font-family: var(--font-num);
-    font-size: clamp(14px, 1.4vw, 18px);
+  .slogan-sub {
+    margin-top: 32px;
+    max-width: 42ch;
+    font-size: 14px;
     color: #c8cdd7;
-    letter-spacing: 0.05em;
-  }
-  .s2-unit {
-    color: #9ca3af;
-  }
-  @media (max-width: 768px) {
-    .scene-2 {
-      flex-direction: column !important;
-      gap: 24px;
-    }
-    .s2-meta {
-      text-align: center;
-    }
+    line-height: 1.6;
+    text-align: left;
   }
 
-  /* ----- Scene 3: Numbers ----- */
-  .s3-grid {
-    display: flex;
-    gap: clamp(32px, 8vw, 96px);
-    flex-wrap: wrap;
-    justify-content: center;
+  /* ----- scene-final: huge wordmark + CTA + grid bg ----- */
+  .scene-final {
+    padding: 0;
   }
-  .s3-stat {
-    text-align: center;
-  }
-  .s3-val {
-    font-family: var(--font-num);
-    font-weight: 900;
-    font-size: clamp(72px, 10vw, 160px);
-    line-height: 1;
-    letter-spacing: -0.04em;
-    color: #fff;
-  }
-  .s3-val .u {
-    font-size: 0.4em;
-    color: #9ca3af;
-    margin-left: 8px;
-  }
-  .s3-label {
-    margin-top: 16px;
-    font-family: var(--font-num);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: #c8cdd7;
-  }
-  .s3-tag {
-    margin-top: 64px;
-    font-family: var(--font-num);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--color-yaja-red);
-  }
-
-  /* ----- Scene 4: On Air ----- */
-  .s4-eyebrow {
-    font-family: var(--font-num);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    color: var(--color-yaja-red);
-    margin-bottom: 48px;
-  }
-  .s4-cards {
+  .final-grid {
+    position: absolute;
+    inset: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-    max-width: 1100px;
-    width: 100%;
+    grid-template-columns: repeat(8, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 8px;
+    padding: 32px;
+    opacity: 0.55;
+    z-index: 1;
   }
-  .s4-card {
+  .final-thumb {
     position: relative;
-    aspect-ratio: 4 / 5;
-    border-radius: 8px;
-    overflow: hidden;
+    aspect-ratio: 9 / 14;
     background: #111;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
   }
-  .s4-card img {
+  .final-thumb video {
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  .s4-card .badge {
-    position: absolute;
-    top: 14px;
-    left: 14px;
-    background: var(--color-yaja-red);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-family: var(--font-num);
-    font-size: 9px;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+  .final-center {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(30, 30, 30, 0.85) 0%,
+      rgba(30, 30, 30, 0.55) 50%,
+      transparent 100%
+    );
+    padding: 64px 96px;
+    border-radius: 24px;
   }
-  .s4-card .name {
-    position: absolute;
-    bottom: 16px;
-    left: 16px;
-    font-family: var(--font-num);
-    font-weight: 800;
-    font-size: clamp(16px, 1.4vw, 20px);
-    color: #fff;
-    text-align: left;
+  .final-lockup {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
-  .s4-card .name .ko {
-    display: block;
-    margin-top: 4px;
-    font-family: var(--font-kr);
-    font-size: 12px;
-    font-weight: 500;
+  .final-flame {
+    width: clamp(40px, 5vw, 64px);
+    filter: drop-shadow(0 0 20px rgba(255, 72, 72, 0.5));
+  }
+  .final-wordmark {
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(72px, 10vw, 144px);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: #fff;
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .final-wordmark .tm {
+    font-size: 0.24em;
     color: #c8cdd7;
+    margin-left: 0.04em;
+    transform: translateY(-0.7em);
+    font-weight: 700;
     letter-spacing: 0;
   }
-  @media (max-width: 768px) {
-    .s4-cards {
-      grid-template-columns: 1fr;
-      max-width: 320px;
-    }
-  }
-
-  /* ----- Scene 5: CTA ----- */
-  .s5-title {
-    font-family: var(--font-num);
-    font-size: clamp(56px, 9vw, 160px);
-    font-weight: 900;
-    letter-spacing: -0.045em;
-    line-height: 0.95;
-    color: #fff;
-    max-width: 14ch;
-  }
-  .s5-title .red {
-    color: var(--color-yaja-red);
-  }
-  .s5-sub {
-    margin-top: 36px;
-    font-size: clamp(16px, 1.5vw, 22px);
-    color: #c8cdd7;
-    font-weight: 500;
-  }
-  .s5-actions {
-    margin-top: 56px;
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .s5-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    padding: 22px 40px;
-    background: var(--color-yaja-red);
-    color: #fff;
+  .final-cta {
+    margin-top: 32px;
+    padding: 16px 36px;
+    background: #fff;
+    color: #1e1e1e;
     font-family: var(--font-num);
     font-size: 13px;
     font-weight: 800;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    border-radius: 6px;
+    border-radius: 999px;
     text-decoration: none;
     transition: transform 0.2s;
   }
-  .s5-cta:hover {
+  .final-cta:hover {
     transform: translateY(-2px);
   }
-  .s5-cta.ghost {
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+  .final-foot {
+    margin-top: 22px;
+    font-family: var(--font-num);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #6e7380;
   }
 
   /* ----- Progress bar ----- */
@@ -566,10 +847,9 @@ const featured = projects[0];
 
   gsap.registerPlugin(ScrollTrigger);
 
-  // ===== Scene cross-fade — same logic as /public/demo.html =====
-  // 5 scenes share one ScrollTrigger; per-frame opacity+scale are
-  // computed from a single scroll-progress value so transitions
-  // properly REPLACE each scene (no stacking).
+  // ===== Scene cross-fade — single ScrollTrigger drives all 8 scenes
+  // The Banas reference packs 8 distinct moments into ~22s of video; we
+  // give each a roughly equal slice of 800vh of scroll progress.
 
   interface SceneSpec {
     sel: string;
@@ -581,108 +861,103 @@ const featured = projects[0];
     el?: HTMLElement | null;
   }
 
+  // Eight scenes evenly spread across [0, 1] with ~12% each, plus
+  // 2-3% transition buffer between holds.
   const sceneSpecs: SceneSpec[] = [
-    // 01 Intro tagline — visible at start, hands off around 0.16
     {
       sel: "#scene0",
-      label: "01 / 06 — Intro",
+      label: "01 / 08 — Intro",
       fadeIn: -Infinity,
       holdStart: 0,
-      holdEnd: 0.1,
-      fadeOut: 0.16,
+      holdEnd: 0.08,
+      fadeOut: 0.13,
     },
-    // 02 Brand (YAJA logo + 韓 sub-copy)
     {
       sel: "#scene1",
-      label: "02 / 06 — Brand",
-      fadeIn: 0.18,
-      holdStart: 0.22,
-      holdEnd: 0.3,
-      fadeOut: 0.36,
+      label: "02 / 08 — Project: Vaseline",
+      fadeIn: 0.14,
+      holdStart: 0.17,
+      holdEnd: 0.23,
+      fadeOut: 0.27,
     },
-    // 03 Featured Campaign
     {
       sel: "#scene2",
-      label: "03 / 06 — Featured",
-      fadeIn: 0.38,
-      holdStart: 0.42,
-      holdEnd: 0.5,
-      fadeOut: 0.56,
+      label: "03 / 08 — Service",
+      fadeIn: 0.28,
+      holdStart: 0.3,
+      holdEnd: 0.35,
+      fadeOut: 0.4,
     },
-    // 04 Numbers
     {
       sel: "#scene3",
-      label: "04 / 06 — Numbers",
-      fadeIn: 0.58,
-      holdStart: 0.62,
-      holdEnd: 0.7,
-      fadeOut: 0.76,
+      label: "04 / 08 — Project: Samsung",
+      fadeIn: 0.41,
+      holdStart: 0.44,
+      holdEnd: 0.5,
+      fadeOut: 0.54,
     },
-    // 05 On Air
     {
       sel: "#scene4",
-      label: "05 / 06 — On Air",
-      fadeIn: 0.78,
-      holdStart: 0.82,
-      holdEnd: 0.88,
-      fadeOut: 0.92,
+      label: "05 / 08 — Process",
+      fadeIn: 0.55,
+      holdStart: 0.58,
+      holdEnd: 0.65,
+      fadeOut: 0.7,
     },
-    // 06 Contact (sticks to end)
     {
       sel: "#scene5",
-      label: "06 / 06 — Contact",
+      label: "06 / 08 — Numbers",
+      fadeIn: 0.71,
+      holdStart: 0.74,
+      holdEnd: 0.79,
+      fadeOut: 0.83,
+    },
+    {
+      sel: "#scene6",
+      label: "07 / 08 — Slogan",
+      fadeIn: 0.84,
+      holdStart: 0.86,
+      holdEnd: 0.9,
+      fadeOut: 0.93,
+    },
+    {
+      sel: "#scene7",
+      label: "08 / 08 — YAJA",
       fadeIn: 0.94,
-      holdStart: 0.98,
+      holdStart: 0.96,
       holdEnd: Infinity,
       fadeOut: Infinity,
     },
   ];
 
-  // Cache element refs
   sceneSpecs.forEach((s) => {
     s.el = document.querySelector<HTMLElement>(s.sel);
   });
 
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
   const clamp01 = (x: number) => Math.max(0, Math.min(1, x));
-  // Ease-out cubic — fast at first then settles. Gives the "float up
-  // and gently land" feel.
   const easeOutCubic = (t: number) => 1 - Math.pow(1 - t, 3);
-  // Ease-in cubic — slow start then accelerates upward on exit.
   const easeInCubic = (t: number) => t * t * t;
 
-  // Distance (px) each scene travels on entrance / exit. Tuned so
-  // it reads as "rises up from below the fold" without being so
-  // large it lags the scroll.
-  const ENTER_Y = 80; // starts 80px below center
-  const EXIT_Y = -60; // exits 60px above center
+  const ENTER_Y = 80; // px
+  const EXIT_Y = -60;
 
   function computeSceneState(p: number, s: SceneSpec) {
-    // Before this scene's window — sit ready below, hidden.
     if (p < s.fadeIn) return { opacity: 0, y: ENTER_Y, scale: 1.02 };
-
-    // Fade-in: rise from below + opacity 0→1.
     if (p < s.holdStart) {
       const raw = clamp01((p - s.fadeIn) / (s.holdStart - s.fadeIn));
       const t = easeOutCubic(raw);
       return { opacity: t, y: lerp(ENTER_Y, 0, t), scale: lerp(1.02, 1, t) };
     }
-
-    // Hold: locked in place.
     if (p <= s.holdEnd) return { opacity: 1, y: 0, scale: 1 };
-
-    // Fade-out: continue drifting up + fade.
     if (p <= s.fadeOut) {
       const raw = clamp01((p - s.holdEnd) / (s.fadeOut - s.holdEnd));
       const t = easeInCubic(raw);
       return { opacity: 1 - t, y: lerp(0, EXIT_Y, t), scale: lerp(1, 0.98, t) };
     }
-
-    // After exit — parked above, hidden.
     return { opacity: 0, y: EXIT_Y, scale: 0.98 };
   }
 
-  // Initial paint: scene 1 visible, rest hidden + parked below.
   sceneSpecs.forEach((s, i) => {
     if (!s.el) return;
     if (i === 0) {
@@ -691,6 +966,9 @@ const featured = projects[0];
       gsap.set(s.el, { opacity: 0, y: ENTER_Y, scale: 1.02 });
     }
   });
+
+  // Background wordmark drifts upward subtly with scroll for parallax.
+  const mark = document.querySelector<HTMLElement>(".story-mark-text");
 
   ScrollTrigger.create({
     trigger: ".story",
@@ -705,40 +983,55 @@ const featured = projects[0];
         s.el.style.opacity = String(opacity);
         s.el.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
       });
-      // Intro lines stagger inside Scene 0
       applyIntroLines(p);
+      applySloganLines(p);
+      if (mark) {
+        // Drift -40px → +40px across full scroll, slight scale.
+        const dy = (p - 0.5) * 80;
+        const sc = 0.85 + p * 0.15;
+        mark.style.transform = `scaleY(0.85) translate3d(0, ${dy}px, 0) scale(${sc})`;
+      }
     },
   });
 
-  // ===== Intro tagline — 3 lines stagger up from below =====
-  // Each line has its own progress window inside Scene 0's lifetime
-  // (Scene 0 is on screen from ~0 → 0.16). Lines reveal at 0.00 / 0.04 /
-  // 0.08 so the whole phrase reads in by ~0.10, then sits until 0.16
-  // before the Brand scene takes over.
+  // ===== Intro tagline line stagger =====
   const introLines = Array.from(
     document.querySelectorAll<HTMLElement>(".s0-tagline .line")
   );
-  // Line 1 pre-revealed (negative start) so the page isn't blank on load;
-  // lines 2 + 3 stagger in as the user begins scrolling.
-  const LINE_STARTS = [-0.04, 0.02, 0.06];
-  const LINE_DURATION = 0.04;
-
+  const INTRO_STARTS = [-0.04, 0.02, 0.05];
+  const INTRO_DUR = 0.04;
   function applyIntroLines(p: number) {
     introLines.forEach((el, i) => {
-      const start = LINE_STARTS[i] ?? 0;
-      const raw = clamp01((p - start) / LINE_DURATION);
+      const start = INTRO_STARTS[i] ?? 0;
+      const raw = clamp01((p - start) / INTRO_DUR);
       const t = easeOutCubic(raw);
       el.style.opacity = String(t);
       el.style.transform = `translate3d(0, ${(1 - t) * 24}px, 0)`;
     });
   }
-  // Paint initial state (all lines hidden, below).
   applyIntroLines(0);
 
-  // ===== Number count-up — fires when Numbers scene fades in =====
-  const nums = document.querySelectorAll<HTMLElement>(".scene-3 .num");
-  const NUM_FIRE = 0.6; // a touch after fadeIn at 0.58
-  const NUM_RESET = 0.55;
+  // ===== Slogan line stagger (Scene 7, fadeIn at 0.84) =====
+  const sloganLines = Array.from(
+    document.querySelectorAll<HTMLElement>(".slogan .line")
+  );
+  const SLOGAN_STARTS = [0.85, 0.865, 0.88];
+  const SLOGAN_DUR = 0.025;
+  function applySloganLines(p: number) {
+    sloganLines.forEach((el, i) => {
+      const start = SLOGAN_STARTS[i] ?? 0;
+      const raw = clamp01((p - start) / SLOGAN_DUR);
+      const t = easeOutCubic(raw);
+      el.style.opacity = String(t);
+      el.style.transform = `translate3d(0, ${(1 - t) * 32}px, 0)`;
+    });
+  }
+  applySloganLines(0);
+
+  // ===== Number count-up — fires when Stats scene fades in =====
+  const nums = document.querySelectorAll<HTMLElement>(".scene-stats .num");
+  const NUM_FIRE = 0.73; // fadeIn at 0.71, fire just after
+  const NUM_RESET = 0.68;
   let numsTriggered = false;
   ScrollTrigger.create({
     trigger: ".story",
