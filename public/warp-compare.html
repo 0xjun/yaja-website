@@ -118,6 +118,43 @@
 <body>
   <h1>YAJA LED Warp — 全パターン比較</h1>
 
+  <!-- ===== REFLECTION series: LED bg behind, logo is dark reflective object ===== -->
+  <div class="panel recommended" style="border-color:#06b6d4;background:rgba(6,182,212,0.08);">
+    <div class="panel-head">
+      <h2>✨ REFLECTION-SHARP — ★★★ 本命 ★★★</h2>
+      <span class="label" style="background:#06b6d4;color:#fff;">LED光を反射</span>
+    </div>
+    <div class="panel-meta">sin-rainbow LED bg + trough + logo mask (15% bleed) + scanline + vignette</div>
+    <img src="/logos/yaja-led-reflection-sharp.jpg" alt="Reflection sharp">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      ✨ LED は背景で発光、ロゴは暗い立体物として光を受けてうっすら色付く
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#06b6d4;background:rgba(6,182,212,0.08);">
+    <div class="panel-head">
+      <h2>✨ REFLECTION-ATMOSPHERIC — 柔らかい</h2>
+      <span class="label" style="background:#06b6d4;color:#fff;">ムード重視</span>
+    </div>
+    <div class="panel-meta">同 recipe + blur σ=1.5 + vignette PI/2.0 + 20% bleed</div>
+    <img src="/logos/yaja-led-reflection-atmospheric.jpg" alt="Reflection atmospheric">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      ✨ 強い vignette、ロゴ edge が bg に溶ける、深いムード
+    </p>
+  </div>
+
+  <div class="panel recommended" style="border-color:#06b6d4;background:rgba(6,182,212,0.08);">
+    <div class="panel-head">
+      <h2>✨ REFLECTION-BALANCED — 中庸</h2>
+      <span class="label" style="background:#06b6d4;color:#fff;">バランス型</span>
+    </div>
+    <div class="panel-meta">同 recipe + 中間設定</div>
+    <img src="/logos/yaja-led-reflection-balanced.jpg" alt="Reflection balanced">
+    <p style="color:#aaa;font-size:13px;margin-top:12px;">
+      ✨ sharp と atmospheric の中間
+    </p>
+  </div>
+
   <!-- ===== FINAL series: trough + scanlines + vignette + saturation + glow ===== -->
   <div class="panel recommended" style="border-color:#ec4899;background:rgba(236,72,153,0.08);">
     <div class="panel-head">
@@ -242,7 +279,7 @@
     </p>
   </div>
 
-  <p class="sub">🆕🎬 FINAL シリーズ — 参照画像の色味・vignette・scanline・glow 適用</p>
+  <p class="sub">🆕✨ REFLECTION シリーズ — ロゴが発光せず、LED の光を反射する立体物として表現</p>
 
   <div class="reference">
     <h3>0. ORIGINAL — 歪みなし</h3>
@@ -498,8 +535,10 @@
   <div class="pick">
     <p>
       気に入った番号を教えてください<br><br>
-      <strong>🎬 完成版（vignette + scanline + glow）</strong><br>
-      <code>final-cinematic</code> ★★★ / <code>final-deep</code> / <code>final-tight</code><br><br>
+      <strong>✨ 反射型（ロゴ非発光 + LED光反射）</strong><br>
+      <code>reflection-sharp</code> ★★★ / <code>reflection-atmospheric</code> / <code>reflection-balanced</code><br><br>
+      <strong>🎬 ロゴ自体発光型</strong><br>
+      <code>final-cinematic</code> / <code>final-deep</code> / <code>final-tight</code><br><br>
       <strong>💎 LED ドットパネル（procedural）</strong><br>
       <code>led-panel-medium</code> ★ / <code>led-panel-mild</code> / <code>led-panel-deep</code><br><br>
       <strong>🛢 ロゴ自体を cylinder 投影</strong><br>
