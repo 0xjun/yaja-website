@@ -306,6 +306,13 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   </div>
 </div>
 
+<!-- ===== Scroll-down indicator (bottom-right) =====
+     Hides itself once the user has scrolled past the Intro scene. -->
+<div class="scroll-cue" id="scroll-cue" aria-hidden="true">
+  <span class="scroll-cue-label">Scroll</span>
+  <span class="scroll-cue-arrow">↓</span>
+</div>
+
 <!-- ===== Bottom progress bar ===== -->
 <div class="progress" id="story-progress"></div>
 
@@ -423,10 +430,31 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     color: #fff;
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
   }
+  /* Each line starts hidden + slightly below, then floats up on page
+     load with a per-line delay. CSS-only so it runs without scroll.
+     Once the animation finishes the line sits at its final state
+     (animation-fill-mode: forwards). */
   .s0-tagline .line {
     opacity: 0;
     transform: translate3d(0, 24px, 0);
     will-change: opacity, transform;
+    animation: s0-line-in 1.0s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  .s0-tagline .line:nth-child(1) { animation-delay: 1.4s; }
+  .s0-tagline .line:nth-child(2) { animation-delay: 2.1s; }
+  .s0-tagline .line:nth-child(3) { animation-delay: 2.8s; }
+  @keyframes s0-line-in {
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .s0-tagline .line {
+      animation: none !important;
+      opacity: 1;
+      transform: none;
+    }
   }
   .s0-tagline .line:last-child::after {
     content: "";
@@ -948,6 +976,56 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     color: #6e7380;
   }
 
+  /* ----- Scroll-down indicator ----- */
+  .scroll-cue {
+    position: fixed;
+    right: 24px;
+    bottom: 28px;
+    z-index: 55;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  /* Fades in after the intro tagline lands (≈ 3.4s) */
+  .scroll-cue.is-ready {
+    opacity: 0.85;
+    transform: translate3d(0, 0, 0);
+  }
+  /* Hides once user has scrolled past the intro */
+  .scroll-cue.is-hidden {
+    opacity: 0 !important;
+    transform: translate3d(0, 8px, 0) !important;
+  }
+  .scroll-cue-label {
+    font-family: var(--font-num);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.7);
+    writing-mode: vertical-rl;
+  }
+  .scroll-cue-arrow {
+    font-size: 18px;
+    color: #fff;
+    line-height: 1;
+    animation: scroll-cue-bounce 1.8s ease-in-out infinite;
+  }
+  @keyframes scroll-cue-bounce {
+    0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.6; }
+    50%      { transform: translate3d(0, 6px, 0); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue-arrow {
+      animation: none;
+    }
+  }
+
   /* ----- Progress bar ----- */
   .story #story-progress,
   .progress {
@@ -1100,6 +1178,13 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   // Background wordmark drifts upward subtly with scroll for parallax.
   const mark = document.querySelector<HTMLElement>(".story-mark-text");
 
+  // Scroll-down cue. Reveal after the intro tagline lands (~3.5s),
+  // hide as soon as the user scrolls into the next scene.
+  const scrollCue = document.getElementById("scroll-cue");
+  if (scrollCue) {
+    window.setTimeout(() => scrollCue.classList.add("is-ready"), 3500);
+  }
+
   ScrollTrigger.create({
     trigger: ".story",
     start: "top top",
@@ -1113,7 +1198,8 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
         s.el.style.opacity = String(opacity);
         s.el.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
       });
-      applyIntroLines(p);
+      // Intro lines are time-based (CSS animation on page load),
+      // so no scroll handler for them here.
       applySloganLines(p);
       applyPopThumbs(p);
       applyRapidThumbs(p);
@@ -1123,27 +1209,20 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
         const sc = 0.85 + p * 0.15;
         mark.style.transform = `scaleY(0.85) translate3d(0, ${dy}px, 0) scale(${sc})`;
       }
+      // Hide the scroll cue once the user has moved past the Intro
+      // scene (Intro fades out at p=0.10).
+      if (scrollCue) {
+        if (p > 0.04) scrollCue.classList.add("is-hidden");
+        else scrollCue.classList.remove("is-hidden");
+      }
     },
   });
 
-  // ===== Intro tagline line stagger =====
-  const introLines = Array.from(
-    document.querySelectorAll<HTMLElement>(".s0-tagline .line")
-  );
-  const INTRO_STARTS = [-0.04, 0.02, 0.05];
-  const INTRO_DUR = 0.04;
-  function applyIntroLines(p: number) {
-    introLines.forEach((el, i) => {
-      const start = INTRO_STARTS[i] ?? 0;
-      const raw = clamp01((p - start) / INTRO_DUR);
-      const t = easeOutCubic(raw);
-      el.style.opacity = String(t);
-      el.style.transform = `translate3d(0, ${(1 - t) * 24}px, 0)`;
-    });
-  }
-  applyIntroLines(0);
+  // Intro line stagger is now CSS-driven (s0-line-in keyframe with
+  // per-line animation-delay) so the tagline floats up after the user
+  // has had a beat to see the empty LED bg. No JS needed.
 
-  // ===== Rapid-fire showcase — scroll-driven flipbook =====
+  //===== Rapid-fire showcase — scroll-driven flipbook =====
   // Map the Rapid Showcase scene's scroll window onto N equal slices
   // (one per thumb). Set exactly one thumb to .is-active per frame
   // based on which slice we're in. Outside the scene window, no thumb
