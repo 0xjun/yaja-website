@@ -41,12 +41,21 @@ const featured = projects[0];
 
 <!-- ===== Fixed top-right scene counter (debug aid + UX cue) ===== -->
 <div class="scene-counter" id="scene-counter">
-  <span class="red">01</span> / 05 — Brand
+  <span class="red">01</span> / 06 — Intro
 </div>
 
-<!-- ===== Story container — 500vh tall, holds the sticky stage ===== -->
+<!-- ===== Story container — 600vh tall, holds the sticky stage ===== -->
 <div class="story" id="story">
   <div class="stage">
+
+    <!-- Scene 0: Intro tagline — 3 lines stagger up from below -->
+    <section class="scene scene-0" id="scene0">
+      <p class="s0-tagline">
+        <span class="line" data-line="1">beyond time,</span>
+        <span class="line" data-line="2">beyond space,</span>
+        <span class="line" data-line="3">with the best creativity.</span>
+      </p>
+    </section>
 
     <!-- Scene 1: Brand reveal -->
     <section class="scene scene-1" id="scene1">
@@ -212,7 +221,7 @@ const featured = projects[0];
   /* ===== Story container & sticky stage ===== */
   .story {
     position: relative;
-    height: 500vh; /* 5 scenes × 100vh */
+    height: 600vh; /* 6 scenes × 100vh (Intro + 5 content scenes) */
     z-index: 2;
   }
   .story .stage {
@@ -233,6 +242,40 @@ const featured = projects[0];
     padding: 32px;
     opacity: 0;
     will-change: opacity, transform;
+  }
+
+  /* ----- Scene 0: Intro tagline ----- */
+  .s0-tagline {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-num);
+    font-weight: 900;
+    font-size: clamp(28px, 4.4vw, 72px);
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+    color: #fff;
+    text-shadow: 0 2px 30px rgba(0, 0, 0, 0.4);
+  }
+  .s0-tagline .line {
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    will-change: opacity, transform;
+    /* The script flips these to (1, 0px) at the right scroll moment. */
+  }
+  .s0-tagline .line:last-child {
+    color: #fff;
+  }
+  .s0-tagline .line:last-child::after {
+    content: "";
+    display: inline-block;
+    width: 0.18em;
+    height: 0.9em;
+    margin-left: 0.12em;
+    background: var(--color-yaja-red);
+    vertical-align: -0.05em;
+    transform: translateY(0.05em);
   }
 
   /* ----- Scene 1: Brand ----- */
@@ -539,47 +582,56 @@ const featured = projects[0];
   }
 
   const sceneSpecs: SceneSpec[] = [
-    // 01 Brand — visible at start, hands off at 0.18
+    // 01 Intro tagline — visible at start, hands off around 0.16
     {
-      sel: "#scene1",
-      label: "01 / 05 — Brand",
+      sel: "#scene0",
+      label: "01 / 06 — Intro",
       fadeIn: -Infinity,
       holdStart: 0,
       holdEnd: 0.1,
-      fadeOut: 0.18,
+      fadeOut: 0.16,
     },
-    // 02 Featured Campaign
+    // 02 Brand (YAJA logo + 韓 sub-copy)
+    {
+      sel: "#scene1",
+      label: "02 / 06 — Brand",
+      fadeIn: 0.18,
+      holdStart: 0.22,
+      holdEnd: 0.3,
+      fadeOut: 0.36,
+    },
+    // 03 Featured Campaign
     {
       sel: "#scene2",
-      label: "02 / 05 — Featured",
-      fadeIn: 0.2,
-      holdStart: 0.25,
-      holdEnd: 0.35,
-      fadeOut: 0.43,
+      label: "03 / 06 — Featured",
+      fadeIn: 0.38,
+      holdStart: 0.42,
+      holdEnd: 0.5,
+      fadeOut: 0.56,
     },
-    // 03 Numbers
+    // 04 Numbers
     {
       sel: "#scene3",
-      label: "03 / 05 — Numbers",
-      fadeIn: 0.45,
-      holdStart: 0.5,
-      holdEnd: 0.6,
-      fadeOut: 0.68,
+      label: "04 / 06 — Numbers",
+      fadeIn: 0.58,
+      holdStart: 0.62,
+      holdEnd: 0.7,
+      fadeOut: 0.76,
     },
-    // 04 On Air
+    // 05 On Air
     {
       sel: "#scene4",
-      label: "04 / 05 — On Air",
-      fadeIn: 0.7,
-      holdStart: 0.75,
-      holdEnd: 0.85,
-      fadeOut: 0.93,
+      label: "05 / 06 — On Air",
+      fadeIn: 0.78,
+      holdStart: 0.82,
+      holdEnd: 0.88,
+      fadeOut: 0.92,
     },
-    // 05 Contact (sticks to end)
+    // 06 Contact (sticks to end)
     {
       sel: "#scene5",
-      label: "05 / 05 — Contact",
-      fadeIn: 0.93,
+      label: "06 / 06 — Contact",
+      fadeIn: 0.94,
       holdStart: 0.98,
       holdEnd: Infinity,
       fadeOut: Infinity,
@@ -653,13 +705,40 @@ const featured = projects[0];
         s.el.style.opacity = String(opacity);
         s.el.style.transform = `translate3d(0, ${y}px, 0) scale(${scale})`;
       });
+      // Intro lines stagger inside Scene 0
+      applyIntroLines(p);
     },
   });
 
+  // ===== Intro tagline — 3 lines stagger up from below =====
+  // Each line has its own progress window inside Scene 0's lifetime
+  // (Scene 0 is on screen from ~0 → 0.16). Lines reveal at 0.00 / 0.04 /
+  // 0.08 so the whole phrase reads in by ~0.10, then sits until 0.16
+  // before the Brand scene takes over.
+  const introLines = Array.from(
+    document.querySelectorAll<HTMLElement>(".s0-tagline .line")
+  );
+  // Line 1 pre-revealed (negative start) so the page isn't blank on load;
+  // lines 2 + 3 stagger in as the user begins scrolling.
+  const LINE_STARTS = [-0.04, 0.02, 0.06];
+  const LINE_DURATION = 0.04;
+
+  function applyIntroLines(p: number) {
+    introLines.forEach((el, i) => {
+      const start = LINE_STARTS[i] ?? 0;
+      const raw = clamp01((p - start) / LINE_DURATION);
+      const t = easeOutCubic(raw);
+      el.style.opacity = String(t);
+      el.style.transform = `translate3d(0, ${(1 - t) * 24}px, 0)`;
+    });
+  }
+  // Paint initial state (all lines hidden, below).
+  applyIntroLines(0);
+
   // ===== Number count-up — fires when Numbers scene fades in =====
   const nums = document.querySelectorAll<HTMLElement>(".scene-3 .num");
-  const NUM_FIRE = 0.47; // a touch after fadeIn at 0.45
-  const NUM_RESET = 0.43;
+  const NUM_FIRE = 0.6; // a touch after fadeIn at 0.58
+  const NUM_RESET = 0.55;
   let numsTriggered = false;
   ScrollTrigger.create({
     trigger: ".story",
