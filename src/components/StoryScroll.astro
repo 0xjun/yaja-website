@@ -344,8 +344,9 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     overflow: hidden;
     pointer-events: none;
   }
+  /* DESIGN.md §3.1: YAJA wordmark uses Nohemi specifically. */
   .story-mark-text {
-    font-family: var(--font-num);
+    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
     font-weight: 900;
     font-size: 48vw;
     letter-spacing: -0.08em;
@@ -372,7 +373,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     backdrop-filter: blur(8px);
   }
   .scene-counter .red {
@@ -416,7 +417,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-size: clamp(32px, 5vw, 84px);
     letter-spacing: -0.025em;
     line-height: 1.05;
-    color: #fff;
+    color: var(--color-yaja-white);
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
   }
   /* Line 1 floats up on page load — slow + dramatic — so the page
@@ -477,9 +478,10 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   .rapid-thumb {
     position: absolute;
     inset: 0;
-    border-radius: 12px;
+    /* DESIGN.md §5.2 — 4–8px range, use the largest token */
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    background: #111;
+    background: var(--color-yaja-charcoal);
     display: none;
     box-shadow:
       0 50px 100px -25px rgba(0, 0, 0, 0.85),
@@ -505,7 +507,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-size: clamp(16px, 1.6vw, 22px);
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     text-shadow: 0 2px 16px rgba(0, 0, 0, 0.7);
   }
 
@@ -527,8 +529,9 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     position: relative;
     width: min(540px, 80vw);
     aspect-ratio: 9 / 14;
-    background: #0a0a0a;
-    border-radius: 14px;
+    background: var(--color-yaja-dark);
+    /* DESIGN.md §5.2 — 4–8px */
+    border-radius: var(--radius-lg);
     overflow: hidden;
     box-shadow:
       0 60px 120px -20px rgba(0, 0, 0, 0.85),
@@ -563,17 +566,17 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-size: clamp(32px, 4.5vw, 60px);
     line-height: 0.96;
     letter-spacing: -0.035em;
-    color: #fff;
+    color: var(--color-yaja-white);
     margin-bottom: 16px;
   }
   .ad-body {
     font-size: 13px;
     line-height: 1.55;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     margin-bottom: 24px;
   }
   .ad-body strong {
-    color: #fff;
+    color: var(--color-yaja-white);
     font-weight: 700;
   }
   .ad-footer {
@@ -588,7 +591,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     gap: 6px;
     padding: 6px 12px;
     background: var(--color-yaja-red);
-    color: #fff;
+    color: var(--color-yaja-white);
     font-family: var(--font-num);
     font-size: 10px;
     font-weight: 800;
@@ -602,7 +605,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #9ca3af;
+    color: var(--color-yaja-gray);
   }
 
   /* ----- scene-modal: Banas UI card moment ----- */
@@ -610,8 +613,9 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     width: min(640px, 88vw);
     padding: 22px 24px 20px;
     background: rgba(245, 245, 247, 0.96);
-    color: #1e1e1e;
-    border-radius: 14px;
+    color: var(--color-yaja-dark);
+    /* DESIGN.md §5.2 — 4–8px */
+    border-radius: var(--radius-lg);
     box-shadow:
       0 60px 120px -20px rgba(0, 0, 0, 0.85),
       0 24px 60px -15px rgba(0, 0, 0, 0.5);
@@ -632,11 +636,11 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     color: var(--color-yaja-red);
   }
   .modal-action {
-    color: #6e7380;
+    color: var(--color-yaja-gray-mid);
   }
   .modal-input {
     font-size: clamp(14px, 1.3vw, 17px);
-    color: #1e1e1e;
+    color: var(--color-yaja-dark);
     font-weight: 500;
     line-height: 1.4;
     margin-bottom: 16px;
@@ -658,7 +662,11 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     display: block;
     width: 64%;
     height: 100%;
-    background: linear-gradient(90deg, #1e1e1e 0%, #6e7380 100%);
+    background: linear-gradient(
+      90deg,
+      var(--color-yaja-dark) 0%,
+      var(--color-yaja-gray-mid) 100%
+    );
   }
   .modal-meta {
     font-family: var(--font-num);
@@ -666,7 +674,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-weight: 700;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: #6e7380;
+    color: var(--color-yaja-gray-mid);
   }
 
   /* ----- scene-steps: Banas "Type. Generate. Ship." layout =====
@@ -717,13 +725,13 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   }
   .step-3 {
     font-size: clamp(56px, 7.4vw, 124px);
-    color: #fff;
+    color: var(--color-yaja-white);
   }
   .steps-foot {
     margin-top: 36px;
     max-width: 24ch;
     font-size: 13px;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     line-height: 1.55;
     letter-spacing: 0.01em;
   }
@@ -819,11 +827,11 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-size: clamp(72px, 11vw, 180px);
     line-height: 0.95;
     letter-spacing: -0.045em;
-    color: #fff;
+    color: var(--color-yaja-white);
   }
   .stat-val .u {
     font-size: 0.32em;
-    color: #9ca3af;
+    color: var(--color-yaja-gray);
     margin-left: 8px;
     font-weight: 700;
   }
@@ -834,7 +842,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
   }
   .stats-tag {
     margin-top: 64px;
@@ -857,7 +865,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-size: clamp(48px, 9vw, 156px);
     letter-spacing: -0.045em;
     line-height: 0.96;
-    color: #fff;
+    color: var(--color-yaja-white);
     text-align: left;
   }
   .slogan .line {
@@ -872,7 +880,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     margin-top: 32px;
     max-width: 42ch;
     font-size: 14px;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     line-height: 1.6;
     text-align: left;
   }
@@ -895,7 +903,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     aspect-ratio: 9 / 14;
     border-radius: 6px;
     overflow: hidden;
-    background: #111;
+    background: var(--color-yaja-charcoal);
     opacity: 0;
     transform: scale(1.35);
     filter: blur(8px);
@@ -925,7 +933,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     z-index: 1;
   }
   .final-grid-thumbs .pop-thumb {
-    border-radius: 5px;
+    border-radius: var(--radius-sm);
   }
 
   /* Respect reduced motion — show static at full state */
@@ -949,7 +957,9 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       transparent 100%
     );
     padding: 64px 96px;
-    border-radius: 24px;
+    /* DESIGN.md §5.2 — radii capped at 8px; this is a vignette
+       backdrop so the radius barely shows anyway, but stay strict. */
+    border-radius: var(--radius-lg);
   }
   .final-lockup {
     display: flex;
@@ -960,19 +970,20 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     width: clamp(40px, 5vw, 64px);
     filter: drop-shadow(0 0 20px rgba(255, 72, 72, 0.5));
   }
+  /* DESIGN.md §3.1: YAJA wordmark uses Nohemi specifically. */
   .final-wordmark {
-    font-family: var(--font-num);
+    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
     font-weight: 900;
     font-size: clamp(72px, 10vw, 144px);
     letter-spacing: -0.05em;
     line-height: 1;
-    color: #fff;
+    color: var(--color-yaja-white);
     display: inline-flex;
     align-items: baseline;
   }
   .final-wordmark .tm {
     font-size: 0.24em;
-    color: #c8cdd7;
+    color: var(--color-yaja-border);
     margin-left: 0.04em;
     transform: translateY(-0.7em);
     font-weight: 700;
@@ -981,8 +992,8 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   .final-cta {
     margin-top: 32px;
     padding: 16px 36px;
-    background: #fff;
-    color: #1e1e1e;
+    background: var(--color-yaja-white);
+    color: var(--color-yaja-dark);
     font-family: var(--font-num);
     font-size: 13px;
     font-weight: 800;
@@ -1002,7 +1013,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     font-weight: 700;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: #6e7380;
+    color: var(--color-yaja-gray-mid);
   }
 
   /* ----- Scroll-down indicator ----- */
@@ -1041,7 +1052,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   }
   .scroll-cue-arrow {
     font-size: 18px;
-    color: #fff;
+    color: var(--color-yaja-white);
     line-height: 1;
     animation: scroll-cue-bounce 1.8s ease-in-out infinite;
   }
