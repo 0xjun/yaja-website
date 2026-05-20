@@ -333,26 +333,27 @@ const stepsColumns: string[][] = Array.from(
     overflow: hidden;
     pointer-events: none;
   }
-  /* Bumped opacity to 0.85: the new barrel video is already darker
-     and brand-red so we can let it sing more. */
+  /* Dimmer than before — user wants the bg more recessed so the
+     foreground content reads with less competition. */
   .story-bg-video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.85;
+    opacity: 0.55;
   }
-  /* Lighter tint than before — only enough to keep headlines legible
-     over the brightest red sections of the loop. */
+  /* Heavier tint pulls the whole bg toward yaja-dark; combined with
+     the lowered video opacity above, the LED-red shows through as a
+     deep ambient glow rather than a bright stage. */
   .story-bg-tint {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(30, 30, 30, 0.32) 0%,
-      rgba(30, 30, 30, 0.1) 40%,
-      rgba(30, 30, 30, 0.55) 100%
+      rgba(30, 30, 30, 0.72) 0%,
+      rgba(30, 30, 30, 0.55) 40%,
+      rgba(30, 30, 30, 0.82) 100%
     );
   }
 
@@ -1242,7 +1243,19 @@ const stepsColumns: string[][] = Array.from(
     }
   });
 
-  // .story-mark element removed; barrel video carries the wordmark.
+  // Slow the barrel video to half-speed so the rotation feels
+  // ambient rather than busy. autoplay+muted+loop are kept; we just
+  // ask the element to play at 0.5x once it's ready.
+  const bgVideo = document.querySelector<HTMLVideoElement>(".story-bg-video");
+  if (bgVideo) {
+    const setRate = () => {
+      bgVideo.playbackRate = 0.5;
+    };
+    setRate();
+    bgVideo.addEventListener("loadedmetadata", setRate);
+    bgVideo.addEventListener("play", setRate);
+  }
+
   // Process scene gets a .is-visible toggle so its column-marquees
   // fade up + start scrolling only while the scene is on screen.
   const stepsScene = document.querySelector<HTMLElement>(".scene-steps");
