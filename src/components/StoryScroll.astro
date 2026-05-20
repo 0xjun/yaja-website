@@ -54,14 +54,21 @@ const finalThumbsWithDelay = FINAL_THUMBS.map((src, i) => ({
   delay: halton(i, 2), // 0..1 normalized
 }));
 
-// Steps scene uses a narrower 3-column grid hugged to the right edge
-// of the viewport so the left "Concept. Create. Distribute." text
-// gets more breathing room. 12 thumbs fill 3 cols × 4 rows.
-const STEPS_THUMBS = ALL_THUMBS.slice(0, 12);
-const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
-  src,
-  delay: halton(i, 2),
-}));
+// Steps scene: 3 vertical columns of drama stills, each scrolling
+// upward at its own speed (roll-up marquee). All 3 columns float in
+// together when the scene appears.
+// Each column gets 8 thumbs (duplicated for seamless loop).
+const STEPS_COL_COUNT = 3;
+const STEPS_PER_COL = 8;
+const stepsColumns: string[][] = Array.from(
+  { length: STEPS_COL_COUNT },
+  (_, c) => {
+    const offset = c * 7;
+    return Array.from({ length: STEPS_PER_COL }, (_, i) =>
+      ALL_THUMBS[(offset + i * 3) % ALL_THUMBS.length],
+    );
+  },
+);
 ---
 
 <!-- ===== Fixed LED background video (behind everything) ===== -->
@@ -226,14 +233,18 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
           YAJA delivers the drama.
         </p>
       </div>
-      <!-- Bleed-right grid of YAJA drama stills. Each pop-thumb is
-           tied to its own scroll-delay so the grid assembles as the
-           user scrolls into the scene (Banas "バババっと" feel). -->
-      <div class="thumb-grid steps-grid-thumbs" aria-hidden="true">
+      <!-- 3-column vertical roll-up marquee. All columns fade in
+           together when scene becomes visible; each column then
+           scrolls upward at its own pace via CSS keyframes. The
+           thumbs in each column repeat twice so the upward translate
+           loops seamlessly. -->
+      <div class="steps-marquee" aria-hidden="true">
         {
-          stepsThumbsWithDelay.map(({ src, delay }) => (
-            <div class="pop-thumb" data-delay={delay.toFixed(3)}>
-              <img src={src} alt="" loading="lazy" />
+          stepsColumns.map((col, c) => (
+            <div class={`steps-col steps-col-${c}`}>
+              {[...col, ...col].map((src) => (
+                <img src={src} alt="" loading="lazy" />
+              ))}
             </div>
           ))
         }
@@ -764,56 +775,83 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     line-height: 1.55;
     letter-spacing: 0.01em;
   }
-  /* Right-hugged 3-column grid (Banas "Type. Generate. Ship." layout
-     ported with fewer columns + tighter right offset for YAJA). */
-  .steps-grid-thumbs {
+  /* 3-column vertical roll-up marquee — right half of the stage. */
+  .steps-marquee {
     position: absolute;
     top: 0;
     bottom: 0;
-    /* keep the left ~55% empty for the text headline */
-    left: 55%;
+    left: 50%;
     right: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr) !important;
-    grid-auto-rows: 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
-    padding: 6vh 3vw 6vh 0;
+    padding: 4vh 3vw 4vh 0;
+    overflow: hidden;
     z-index: 2;
+    /* Whole marquee fades up when scene enters (matches the
+       scene's own float-up so user reads "all three at once"). */
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    transition: opacity 0.9s ease, transform 0.9s ease;
   }
-  .steps-grid-thumbs .pop-thumb {
-    border-radius: 4px;
-    aspect-ratio: auto;
+  .scene-steps.is-visible .steps-marquee {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
-  /* Soft fade on the right so the bleed feels intentional, not cut */
-  .steps-grid-thumbs::after {
+  /* Each column scrolls upward continuously at its own speed. */
+  .steps-col {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    will-change: transform;
+    animation-name: steps-col-up;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-play-state: paused;
+  }
+  .scene-steps.is-visible .steps-col {
+    animation-play-state: running;
+  }
+  .steps-col img {
+    width: 100%;
+    aspect-ratio: 9 / 14;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+    background: var(--color-yaja-charcoal);
+    display: block;
+  }
+  /* Each column scrolls -50% (the duplicate point) over its own period */
+  @keyframes steps-col-up {
+    from { transform: translate3d(0, 0, 0); }
+    to   { transform: translate3d(0, -50%, 0); }
+  }
+  .steps-col-0 { animation-duration: 28s; }
+  .steps-col-1 { animation-duration: 42s; animation-delay: -8s; }
+  .steps-col-2 { animation-duration: 34s; animation-delay: -16s; }
+  /* Soft edges so the marquee dissolves into the LED bg */
+  .steps-marquee::before,
+  .steps-marquee::after {
     content: "";
     position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 18%;
-    pointer-events: none;
-    background: linear-gradient(
-      270deg,
-      rgba(30, 30, 30, 0.85) 0%,
-      transparent 100%
-    );
-  }
-  /* Fade-left so text isn't fighting bright thumbs at the boundary */
-  .steps-grid-thumbs::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    bottom: 0;
     left: 0;
-    width: 12%;
+    right: 0;
+    height: 14%;
     pointer-events: none;
-    background: linear-gradient(
-      90deg,
-      rgba(30, 30, 30, 0.75) 0%,
-      transparent 100%
-    );
-    z-index: 1;
+    z-index: 3;
+  }
+  .steps-marquee::before {
+    top: 0;
+    background: linear-gradient(180deg, var(--color-yaja-dark), transparent);
+  }
+  .steps-marquee::after {
+    bottom: 0;
+    background: linear-gradient(0deg, var(--color-yaja-dark), transparent);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .steps-col {
+      animation: none !important;
+      transform: translate3d(0, -25%, 0);
+    }
   }
   @media (max-width: 900px) {
     .scene-steps {
@@ -828,14 +866,13 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     .steps-list {
       align-items: center;
     }
-    .steps-grid-thumbs {
+    .steps-marquee {
       position: relative;
       left: 0;
       right: 0;
       top: auto;
       bottom: auto;
-      height: 36vh;
-      grid-template-columns: repeat(3, 1fr);
+      height: 38vh;
       margin-top: 24px;
       padding: 0 16px;
     }
@@ -851,25 +888,25 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   .stat-cell {
     text-align: center;
   }
-  /* DESIGN.md §3.1 — Nohemi is the display face for English + numbers.
-     Pretendard's numerals are functional (good for tabular dashboards)
-     but Nohemi gives the big stat digits the cinematic weight Banas
-     uses. */
+  /* User preferred Pretendard for the stat digits (Nohemi read as
+     uneven at display size). Bumped overall scale + tightened
+     tracking so the digits still feel cinematic. */
   .stat-val {
-    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
+    font-family: var(--font-num); /* Pretendard with tabular nums */
+    font-variant-numeric: tabular-nums;
     font-weight: 900;
-    font-size: clamp(72px, 11vw, 180px);
-    line-height: 0.95;
-    letter-spacing: -0.045em;
+    font-size: clamp(92px, 14vw, 220px);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
     color: var(--color-yaja-white);
   }
-  /* The unit (억 / 만) is Korean — stay in Pretendard. */
   .stat-val .u {
     font-family: var(--font-kr);
-    font-size: 0.32em;
+    font-size: 0.3em;
     color: var(--color-yaja-gray);
-    margin-left: 8px;
+    margin-left: 10px;
     font-weight: 700;
+    letter-spacing: 0;
   }
   .stat-label {
     margin-top: 16px;
@@ -1230,6 +1267,9 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
 
   // Background wordmark drifts upward subtly with scroll for parallax.
   const mark = document.querySelector<HTMLElement>(".story-mark-text");
+  // Process scene gets a .is-visible toggle so its column-marquees
+  // fade up + start scrolling only while the scene is on screen.
+  const stepsScene = document.querySelector<HTMLElement>(".scene-steps");
 
   // Scroll-down cue. Reveal after the intro tagline lands (~3.5s),
   // hide as soon as the user scrolls into the next scene.
@@ -1269,6 +1309,12 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       if (scrollCue) {
         if (p > 0.04) scrollCue.classList.add("is-hidden");
         else scrollCue.classList.remove("is-hidden");
+      }
+      // Toggle .is-visible on the Process scene so its column
+      // marquees fade up + start scrolling when the scene enters.
+      if (stepsScene) {
+        if (p >= 0.55 && p <= 0.76) stepsScene.classList.add("is-visible");
+        else stepsScene.classList.remove("is-visible");
       }
     },
   });
@@ -1314,36 +1360,68 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   const RAPID_END = 0.24;
   let rapidActive = -1;
 
-  // Each thumb slice is split into "show" + "gap" so the LED bg is
-  // briefly visible between thumbs — the eye reads it as discrete
-  // pops rather than a smooth slideshow. Tune VISIBLE_RATIO to
-  // change how long the thumb stays vs the gap.
-  const VISIBLE_RATIO = 0.55; // 55% thumb, 45% empty per slice
+  // Showcase is now time-driven, not scroll-driven. Once the user
+  // enters the scene, an interval cycles every thumb (show 250ms,
+  // gap 80ms) until all 16 have played, regardless of scroll speed.
+  // The scene's own scroll window remains in control of fade-in /
+  // fade-out, but selection is time-based.
+  const RAPID_SHOW_MS = 250;
+  const RAPID_GAP_MS = 80;
+  let rapidTimer: number | null = null;
+  let rapidCycleIdx = 0;
+
+  function setRapidVisible(idx: number) {
+    if (idx === rapidActive) return;
+    if (rapidActive !== -1) rapidThumbs[rapidActive]?.classList.remove("is-active");
+    if (idx !== -1) rapidThumbs[idx]?.classList.add("is-active");
+    rapidActive = idx;
+  }
+
+  function clearRapidCycle() {
+    if (rapidTimer !== null) {
+      clearTimeout(rapidTimer);
+      rapidTimer = null;
+    }
+    setRapidVisible(-1);
+    rapidCycleIdx = 0;
+  }
+
+  function tickRapidCycle() {
+    // Show current thumb for SHOW_MS, then GAP (no thumb) for GAP_MS,
+    // then advance. After last thumb + gap, stop (leave nothing
+    // visible so the LED bg shows through the rest of the hold).
+    if (rapidCycleIdx >= rapidThumbs.length) {
+      setRapidVisible(-1);
+      rapidTimer = null;
+      return;
+    }
+    setRapidVisible(rapidCycleIdx);
+    rapidTimer = window.setTimeout(() => {
+      setRapidVisible(-1);
+      rapidTimer = window.setTimeout(() => {
+        rapidCycleIdx += 1;
+        tickRapidCycle();
+      }, RAPID_GAP_MS);
+    }, RAPID_SHOW_MS);
+  }
+
+  function startRapidCycle() {
+    if (rapidTimer !== null) return; // already playing
+    rapidCycleIdx = 0;
+    tickRapidCycle();
+  }
 
   function applyRapidThumbs(p: number) {
     if (rapidThumbs.length === 0) return;
     if (p < RAPID_START || p > RAPID_END) {
-      if (rapidActive !== -1) {
-        rapidThumbs.forEach((el) => el.classList.remove("is-active"));
-        rapidActive = -1;
+      // Outside the scene — reset (so re-entering plays from start)
+      if (rapidTimer !== null || rapidActive !== -1) {
+        clearRapidCycle();
       }
       return;
     }
-    const local = (p - RAPID_START) / (RAPID_END - RAPID_START); // 0..1
-    const scaled = local * rapidThumbs.length;
-    const idx = Math.min(rapidThumbs.length - 1, Math.floor(scaled));
-    const within = scaled - idx; // 0..1 inside this thumb's slice
-    // First VISIBLE_RATIO of the slice → show thumb; rest → gap.
-    const desired = within < VISIBLE_RATIO ? idx : -1;
-    if (desired !== rapidActive) {
-      if (rapidActive !== -1) {
-        rapidThumbs[rapidActive]?.classList.remove("is-active");
-      }
-      if (desired !== -1) {
-        rapidThumbs[desired]?.classList.add("is-active");
-      }
-      rapidActive = desired;
-    }
+    // Inside the scene — kick off the auto-play once
+    startRapidCycle();
   }
   // Paint initial state: show first thumb if we're already past 0
   applyRapidThumbs(0);
