@@ -54,10 +54,10 @@ const finalThumbsWithDelay = FINAL_THUMBS.map((src, i) => ({
   delay: halton(i, 2), // 0..1 normalized
 }));
 
-// Steps scene uses a wider, taller grid that bleeds off the right edge
-// of the viewport (Banas "Type. Generate. Ship." layout). 25 thumbs
-// give us 5 columns × 5 rows.
-const STEPS_THUMBS = ALL_THUMBS.slice(0, 25);
+// Steps scene uses a narrower 3-column grid hugged to the right edge
+// of the viewport so the left "Concept. Create. Distribute." text
+// gets more breathing room. 12 thumbs fill 3 cols × 4 rows.
+const STEPS_THUMBS = ALL_THUMBS.slice(0, 12);
 const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   src,
   delay: halton(i, 2),
@@ -103,13 +103,21 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
 <div class="story" id="story">
   <div class="stage">
 
-    <!-- Scene 0: Intro tagline — 3 lines stagger up from below -->
+    <!-- Scene 0: Intro tagline.
+         Line 1 floats up on page load (CSS keyframe).
+         Line 2 + subtitle rise on scroll.
+         Within each line, "Beyond" / "beyond" sits in gray and the
+         payload ("time," / "space.") is bold white. -->
     <section class="scene scene-0" id="scene0">
       <p class="s0-tagline">
-        <span class="line" data-line="1">beyond time,</span>
-        <span class="line" data-line="2">beyond space,</span>
-        <span class="line" data-line="3">with the best creativity.</span>
+        <span class="line" data-line="1">
+          <span class="dim">Beyond</span> <span class="loud">time,</span>
+        </span>
+        <span class="line" data-line="2">
+          <span class="dim">beyond</span> <span class="loud">space.</span>
+        </span>
       </p>
+      <p class="s0-sub">We create the best with our creativity.</p>
     </section>
 
     <!-- Scene 1b: Rapid-fire showcase — scroll-driven flipbook.
@@ -283,10 +291,15 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       </div>
 
       <div class="final-center">
-        <div class="final-lockup">
-          <img src="/logos/fire-symbol/red-symbol.png" alt="" class="final-flame" />
-          <span class="final-wordmark">YAJA<span class="tm">™</span></span>
-        </div>
+        <!-- DESIGN.md §3.1 — use the official combined YAJA logo
+             (flame + wordmark) rather than re-typing the brand. -->
+        <img
+          src="/logos/yaja-symbol/red-symbol.png"
+          alt="YAJA"
+          class="final-logo"
+          width="829"
+          height="443"
+        />
         <a href="mailto:info@yajacamp.com" class="final-cta">Start a project</a>
         <p class="final-foot">yajacamp.com</p>
       </div>
@@ -406,24 +419,42 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     will-change: opacity, transform;
   }
 
-  /* ----- Scene 0: Intro tagline ----- */
+  /* ----- Scene 0: Intro tagline -----
+     "Beyond time, beyond space." across two lines. Within each line,
+     ".dim" sits in gray + lighter weight, ".loud" is bold white. */
   .s0-tagline {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
     font-family: var(--font-num);
-    font-weight: 900;
-    font-size: clamp(32px, 5vw, 84px);
+    font-size: clamp(36px, 5.6vw, 92px);
     letter-spacing: -0.025em;
     line-height: 1.05;
-    color: var(--color-yaja-white);
     text-shadow: 0 2px 30px rgba(0, 0, 0, 0.5);
   }
-  /* Line 1 floats up on page load — slow + dramatic — so the page
-     starts on the LED bg alone, then "beyond time," appears.
-     Lines 2 + 3 stay hidden until the user starts scrolling; JS
-     interpolates them from scroll progress (see applyIntroLines). */
+  .s0-tagline .dim {
+    color: var(--color-yaja-border);
+    font-weight: 500;
+  }
+  .s0-tagline .loud {
+    color: var(--color-yaja-white);
+    font-weight: 900;
+  }
+  .s0-tagline .line:last-child .loud::after {
+    /* red caret-block on the period line */
+    content: "";
+    display: inline-block;
+    width: 0.14em;
+    height: 0.82em;
+    margin-left: 0.12em;
+    background: var(--color-yaja-red);
+    vertical-align: -0.05em;
+    transform: translateY(0.05em);
+  }
+  /* Line 1 floats up on page load — slow + dramatic. Line 2 + sub
+     stay hidden until the user starts scrolling; JS interpolates
+     them from scroll progress (see applyIntroLinesScroll). */
   .s0-tagline .line {
     opacity: 0;
     transform: translate3d(0, 64px, 0);
@@ -442,22 +473,27 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       transform: translate3d(0, 0, 0);
     }
   }
+
+  /* Smaller subtitle below the tagline, also scroll-tied. */
+  .s0-sub {
+    margin-top: clamp(24px, 3vh, 40px);
+    font-family: var(--font-num);
+    font-size: clamp(14px, 1.4vw, 20px);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--color-yaja-border);
+    opacity: 0;
+    transform: translate3d(0, 24px, 0);
+    will-change: opacity, transform;
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .s0-tagline .line {
+    .s0-tagline .line,
+    .s0-sub {
       animation: none !important;
       opacity: 1;
       transform: none;
     }
-  }
-  .s0-tagline .line:last-child::after {
-    content: "";
-    display: inline-block;
-    width: 0.16em;
-    height: 0.85em;
-    margin-left: 0.14em;
-    background: var(--color-yaja-red);
-    vertical-align: -0.05em;
-    transform: translateY(0.05em);
   }
 
   /* ----- scene-rapid: scroll-driven flipbook of drama stills -----
@@ -471,9 +507,11 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   }
   .rapid-stage {
     position: relative;
-    width: min(600px, 80vw);
-    aspect-ratio: 9 / 14;
-    max-height: 70vh;
+    /* Match the Project section card width + 9:16 ratio so the
+       rapid showcase and the project cards feel continuous. */
+    width: min(540px, 80vw);
+    aspect-ratio: 9 / 16;
+    max-height: 80vh;
   }
   .rapid-thumb {
     position: absolute;
@@ -528,7 +566,7 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   .ad-card {
     position: relative;
     width: min(540px, 80vw);
-    aspect-ratio: 9 / 14;
+    aspect-ratio: 9 / 16;
     background: var(--color-yaja-dark);
     /* DESIGN.md §5.2 — 4–8px */
     border-radius: var(--radius-lg);
@@ -735,20 +773,21 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     line-height: 1.55;
     letter-spacing: 0.01em;
   }
-  /* Right-bleed grid. Anchored to the right of the stage and pulled
-     past the edge so the last column gets clipped — that's the Banas
-     "wall of posters runs off the screen" feel. */
+  /* Right-hugged 3-column grid. Pinned to the right half of the
+     stage with extra left padding so the bleed feels intentional
+     without crowding the text. */
   .steps-grid-thumbs {
     position: absolute;
     top: 0;
     bottom: 0;
-    left: clamp(280px, 32vw, 460px);
-    right: -10vw;
+    /* leave more room on the left for the text + breathing room */
+    left: 50%;
+    right: 0;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-auto-rows: 1fr;
-    gap: 8px;
-    padding: 4vh 16px 4vh 0;
+    gap: 10px;
+    padding: 4vh 4vw 4vh 0;
     z-index: 2;
   }
   .steps-grid-thumbs .pop-thumb {
@@ -805,9 +844,10 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
       right: 0;
       top: auto;
       bottom: auto;
-      height: 40vh;
+      height: 36vh;
       grid-template-columns: repeat(3, 1fr);
       margin-top: 24px;
+      padding: 0 16px;
     }
   }
 
@@ -961,33 +1001,12 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
        backdrop so the radius barely shows anyway, but stay strict. */
     border-radius: var(--radius-lg);
   }
-  .final-lockup {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-  .final-flame {
-    width: clamp(40px, 5vw, 64px);
-    filter: drop-shadow(0 0 20px rgba(255, 72, 72, 0.5));
-  }
-  /* DESIGN.md §3.1: YAJA wordmark uses Nohemi specifically. */
-  .final-wordmark {
-    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
-    font-weight: 900;
-    font-size: clamp(72px, 10vw, 144px);
-    letter-spacing: -0.05em;
-    line-height: 1;
-    color: var(--color-yaja-white);
-    display: inline-flex;
-    align-items: baseline;
-  }
-  .final-wordmark .tm {
-    font-size: 0.24em;
-    color: var(--color-yaja-border);
-    margin-left: 0.04em;
-    transform: translateY(-0.7em);
-    font-weight: 700;
-    letter-spacing: 0;
+  /* DESIGN.md §3.1 — official combined logo (flame + wordmark). */
+  .final-logo {
+    width: clamp(280px, 38vw, 560px);
+    height: auto;
+    display: block;
+    filter: drop-shadow(0 12px 32px rgba(255, 72, 72, 0.25));
   }
   .final-cta {
     margin-top: 32px;
@@ -1260,20 +1279,24 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     },
   });
 
-  // ===== Intro line 2 + 3 are scroll-tied =====
-  // Line 1 ("beyond time,") rises via CSS keyframe on page load
-  // (see .s0-tagline .line:nth-child(1) in styles).
-  // Lines 2 + 3 stay hidden until the user starts scrolling, then
-  // each rises from below over its own slice of progress.
-  const introLines2_3 = Array.from(
-    document.querySelectorAll<HTMLElement>(".s0-tagline .line"),
-  ).slice(1); // skip line 1
-  const INTRO_STARTS_2_3 = [0.012, 0.035]; // lines 2 and 3
-  const INTRO_DUR_2_3 = 0.025;
+  // ===== Intro line 2 + subtitle are scroll-tied =====
+  // Line 1 ("Beyond time,") rises via CSS keyframe on page load.
+  // Line 2 ("beyond space.") + subtitle stay hidden until the user
+  // starts scrolling, then each rises from below over its own slice.
+  const introScrollTargets = (() => {
+    const all = Array.from(
+      document.querySelectorAll<HTMLElement>(".s0-tagline .line"),
+    );
+    const line2 = all[1];
+    const sub = document.querySelector<HTMLElement>(".s0-sub");
+    return [line2, sub].filter((el): el is HTMLElement => Boolean(el));
+  })();
+  const INTRO_STARTS_2_S = [0.012, 0.038]; // line 2, then subtitle
+  const INTRO_DUR_2_S = 0.028;
   function applyIntroLinesScroll(p: number) {
-    introLines2_3.forEach((el, i) => {
-      const start = INTRO_STARTS_2_3[i] ?? 0;
-      const raw = clamp01((p - start) / INTRO_DUR_2_3);
+    introScrollTargets.forEach((el, i) => {
+      const start = INTRO_STARTS_2_S[i] ?? 0;
+      const raw = clamp01((p - start) / INTRO_DUR_2_S);
       const t = easeOutCubic(raw);
       el.style.opacity = String(t);
       el.style.transform = `translate3d(0, ${(1 - t) * 28}px, 0)`;
