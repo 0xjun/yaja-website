@@ -84,7 +84,6 @@ const stepsColumns: string[][] = Array.from(
         preload="metadata"
         class="story-bg-video"
       >
-        <source src="/videos/yaja-led-bg.webm" type="video/webm" />
         <source src={hero.video} type="video/mp4" />
       </video>
     )
@@ -93,13 +92,9 @@ const stepsColumns: string[][] = Array.from(
   <div class="story-bg-tint"></div>
 </div>
 
-<!-- ===== Huge blurred YAJA wordmark — Banas signature move.
-     Sits BEHIND scene content but IN FRONT of the LED bg, so the
-     LED glows through the letters. Slowly drifts with scroll for
-     parallax depth. ===== -->
-<div class="story-mark" aria-hidden="true">
-  <span class="story-mark-text">YAJA</span>
-</div>
+<!-- (Removed the standalone blurred YAJA bg wordmark — the new
+     barrel video already showcases the YAJA wordmark prominently,
+     so an extra blurred YAJA on top of it was redundant.) -->
 
 <!-- ===== Top-right scene counter ===== -->
 <div class="scene-counter" id="scene-counter">
@@ -338,49 +333,31 @@ const stepsColumns: string[][] = Array.from(
     overflow: hidden;
     pointer-events: none;
   }
+  /* Bumped opacity to 0.85: the new barrel video is already darker
+     and brand-red so we can let it sing more. */
   .story-bg-video {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    opacity: 0.75;
+    opacity: 0.85;
   }
+  /* Lighter tint than before — only enough to keep headlines legible
+     over the brightest red sections of the loop. */
   .story-bg-tint {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       180deg,
-      rgba(30, 30, 30, 0.55) 0%,
-      rgba(30, 30, 30, 0.25) 38%,
-      rgba(30, 30, 30, 0.7) 100%
+      rgba(30, 30, 30, 0.32) 0%,
+      rgba(30, 30, 30, 0.1) 40%,
+      rgba(30, 30, 30, 0.55) 100%
     );
   }
 
-  /* ===== Huge blurred YAJA wordmark — Banas-style signature bg ===== */
-  .story-mark {
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  /* DESIGN.md §3.1: YAJA wordmark uses Nohemi specifically. */
-  .story-mark-text {
-    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
-    font-weight: 900;
-    font-size: 48vw;
-    letter-spacing: -0.08em;
-    line-height: 1;
-    color: rgba(255, 255, 255, 0.06);
-    filter: blur(28px);
-    transform: scaleY(0.85);
-    white-space: nowrap;
-    will-change: transform;
-  }
+  /* (.story-mark element removed — barrel video now carries the
+     blurred YAJA wordmark itself.) */
 
   /* ===== Scene counter (top-right pill) ===== */
   .scene-counter {
@@ -1265,8 +1242,7 @@ const stepsColumns: string[][] = Array.from(
     }
   });
 
-  // Background wordmark drifts upward subtly with scroll for parallax.
-  const mark = document.querySelector<HTMLElement>(".story-mark-text");
+  // .story-mark element removed; barrel video carries the wordmark.
   // Process scene gets a .is-visible toggle so its column-marquees
   // fade up + start scrolling only while the scene is on screen.
   const stepsScene = document.querySelector<HTMLElement>(".scene-steps");
@@ -1298,12 +1274,7 @@ const stepsColumns: string[][] = Array.from(
       applySloganLines(p);
       applyPopThumbs(p);
       applyRapidThumbs(p);
-      if (mark) {
-        // Drift -40px → +40px across full scroll, slight scale.
-        const dy = (p - 0.5) * 80;
-        const sc = 0.85 + p * 0.15;
-        mark.style.transform = `scaleY(0.85) translate3d(0, ${dy}px, 0) scale(${sc})`;
-      }
+      // (mark drift removed — barrel video supplies the wordmark.)
       // Hide the scroll cue once the user has moved past the Intro
       // scene (Intro fades out at p=0.10).
       if (scrollCue) {
