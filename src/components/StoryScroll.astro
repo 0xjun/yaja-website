@@ -441,17 +441,8 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     color: var(--color-yaja-white);
     font-weight: 900;
   }
-  .s0-tagline .line:last-child .loud::after {
-    /* red caret-block on the period line */
-    content: "";
-    display: inline-block;
-    width: 0.14em;
-    height: 0.82em;
-    margin-left: 0.12em;
-    background: var(--color-yaja-red);
-    vertical-align: -0.05em;
-    transform: translateY(0.05em);
-  }
+  /* (Red caret-block after "space." removed per request.) */
+
   /* Line 1 floats up on page load — slow + dramatic. Line 2 + sub
      stay hidden until the user starts scrolling; JS interpolates
      them from scroll progress (see applyIntroLinesScroll). */
@@ -773,21 +764,20 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     line-height: 1.55;
     letter-spacing: 0.01em;
   }
-  /* Right-hugged 3-column grid. Pinned to the right half of the
-     stage with extra left padding so the bleed feels intentional
-     without crowding the text. */
+  /* Right-hugged 3-column grid (Banas "Type. Generate. Ship." layout
+     ported with fewer columns + tighter right offset for YAJA). */
   .steps-grid-thumbs {
     position: absolute;
     top: 0;
     bottom: 0;
-    /* leave more room on the left for the text + breathing room */
-    left: 50%;
+    /* keep the left ~55% empty for the text headline */
+    left: 55%;
     right: 0;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(3, 1fr) !important;
     grid-auto-rows: 1fr;
-    gap: 10px;
-    padding: 4vh 4vw 4vh 0;
+    gap: 12px;
+    padding: 6vh 3vw 6vh 0;
     z-index: 2;
   }
   .steps-grid-thumbs .pop-thumb {
@@ -861,15 +851,21 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
   .stat-cell {
     text-align: center;
   }
+  /* DESIGN.md §3.1 — Nohemi is the display face for English + numbers.
+     Pretendard's numerals are functional (good for tabular dashboards)
+     but Nohemi gives the big stat digits the cinematic weight Banas
+     uses. */
   .stat-val {
-    font-family: var(--font-num);
+    font-family: "Nohemi", "Pretendard", system-ui, sans-serif;
     font-weight: 900;
     font-size: clamp(72px, 11vw, 180px);
     line-height: 0.95;
     letter-spacing: -0.045em;
     color: var(--color-yaja-white);
   }
+  /* The unit (억 / 만) is Korean — stay in Pretendard. */
   .stat-val .u {
+    font-family: var(--font-kr);
     font-size: 0.32em;
     color: var(--color-yaja-gray);
     margin-left: 8px;
@@ -956,12 +952,10 @@ const stepsThumbsWithDelay = STEPS_THUMBS.map((src, i) => ({
     display: block;
   }
 
-  /* steps scene — 4×2 grid on the right column */
-  .steps-grid-thumbs {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    max-width: 540px;
-  }
+  /* NOTE: .steps-grid-thumbs is defined above next to .scene-steps
+     (3 columns, right-hugged). Don't redefine it here — a later
+     rule was overriding it back to 4 columns and breaking the
+     Banas "Type. Generate. Ship." layout. */
 
   /* final scene — 8×4 grid filling the full stage as bg */
   .final-grid-thumbs {
